@@ -417,6 +417,22 @@ nav#main-nav {
 }
 
 /* ─── Search, Filters & Sorting ─────────────────────────────────────────────── */
+.search-filter-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    max-width: 1200px;
+    margin: 0 auto 30px;
+    width: 100%;
+}
+
+.search-filter-header-row .search-pill-container {
+    flex: 1;
+    max-width: 600px;
+    margin: 0;
+}
+
 .search-pill-container {
     position: relative;
     max-width: 720px;
@@ -451,6 +467,29 @@ nav#main-nav {
     pointer-events: none;
 }
 
+.dropdown-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-wrapper .filter-dropdown-card {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    z-index: 1000;
+    margin: 0;
+    width: 440px;
+}
+
+.dropdown-wrapper .sort-dropdown-card {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    z-index: 1000;
+    margin: 0;
+    width: 200px;
+}
+
 .filter-sort-buttons {
     display: flex;
     justify-content: center;
@@ -480,6 +519,33 @@ nav#main-nav {
     background-color: var(--accent-teal);
     color: var(--text-light);
     border-color: var(--accent-teal);
+}
+
+/* Mobile responsive layout for search, filter & sort */
+@media (max-width: 768px) {
+    .search-filter-header-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    .search-filter-header-row .search-pill-container {
+        max-width: 100%;
+    }
+    .search-filter-header-row .dropdown-wrapper {
+        width: 100%;
+    }
+    .search-filter-header-row .btn-filter,
+    .search-filter-header-row .btn-sort {
+        width: 100%;
+    }
+    .dropdown-wrapper .filter-dropdown-card,
+    .dropdown-wrapper .sort-dropdown-card {
+        right: auto;
+        left: 50%;
+        transform: translateX(-50%);
+        width: calc(100vw - 32px);
+        max-width: 440px;
+    }
 }
 
 /* Redesigned filter/sort cards */
@@ -669,9 +735,19 @@ nav#main-nav {
 /* ─── Cards & Grid System ───────────────────────────────────────────────────── */
 .listing-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 30px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
     padding: 8px 0;
+}
+@media (max-width: 1200px) {
+    .listing-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media (max-width: 992px) {
+    .listing-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 /* Browse listing card styles */
@@ -693,7 +769,7 @@ nav#main-nav {
 
 .listing-img-wrap {
     position: relative;
-    height: 220px;
+    height: 170px; /* Shorter image height matching mockup ratio */
     overflow: hidden;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -724,7 +800,7 @@ nav#main-nav {
 }
 
 .listing-info {
-    padding: 24px;
+    padding: 20px; /* Slightly shorter padding for a compact layout */
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -732,7 +808,7 @@ nav#main-nav {
 
 .listing-name {
     font-family: var(--font-serif);
-    font-size: 1.4rem;
+    font-size: 1.3rem; /* Slightly smaller to fit 4-column layout */
     font-weight: 500;
     margin-bottom: 4px;
 }
@@ -741,18 +817,11 @@ nav#main-nav {
     font-size: 0.85rem;
     font-style: italic;
     color: var(--text-light-muted);
-    margin-bottom: 12px;
+    margin-bottom: 16px; /* Space before footer */
 }
 
 .listing-desc {
-    font-size: 0.85rem;
-    color: var(--text-light-muted);
-    margin-bottom: 20px;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    line-height: 1.5;
+    display: none; /* Hide descriptions on card lists to match mockup */
 }
 
 .listing-footer {
@@ -777,10 +846,11 @@ nav#main-nav {
 .btn-view-details {
     background-color: #92857a;
     color: var(--text-light);
-    border-radius: 20px;
-    padding: 8px 16px;
-    font-size: 0.8rem;
+    border-radius: 30px; /* Fully rounded pill shape */
+    padding: 8px 20px;
+    font-size: 0.85rem;
     font-weight: 600;
+    transition: background var(--transition);
 }
 
 .btn-view-details:hover {
