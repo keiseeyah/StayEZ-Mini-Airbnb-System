@@ -924,13 +924,13 @@ table.admin-table tr:last-child td {
     padding: 40px 24px;
 }
 .welcome-card {
-    width: 100%;
-    max-width: 820px; /* Spacious width from mockup */
+    width: 90%;
+    max-width: 1100px; /* Wider layout matching the mockup ratio */
     background-color: rgba(36, 62, 60, 0.82); /* Glass dark teal */
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-radius: 40px; /* Large rounded corners */
-    padding: 64px 80px; /* Generous padding */
+    padding: 64px 100px; /* More spacious horizontal padding */
     color: var(--text-light);
     box-shadow: var(--shadow-medium);
 }
