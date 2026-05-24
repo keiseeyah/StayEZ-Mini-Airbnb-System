@@ -73,6 +73,24 @@ router.get('/mine', checkRole(['Guest']), async (req, res) => {
     }
 });
 
+// ─── GET /api/bookings/host ─── Host sees ALL booking requests for ALL of their listings ──
+router.get('/host', checkRole(['Host']), async (req, res) => {
+    try {
+        const hostId = req.userId;
+        const listings = await Listing.find({ hostId });
+        const listingIds = listings.map(l => l._id);
+
+        const bookings = await Booking.find({ listingId: { $in: listingIds } })
+            .populate('listingId', 'name location price image type')
+            .populate('guestId', 'name email')
+            .sort({ createdAt: -1 });
+
+        res.status(200).json(bookings);
+    } catch (err) {
+        res.status(500).json({ message: 'Error fetching host bookings.', error: err.message });
+    }
+});
+
 // ─── GET /api/bookings/listing/:listingId ─── Host sees bookings for one listing ──
 router.get('/listing/:listingId', checkRole(['Host']), async (req, res) => {
     try {
@@ -87,6 +105,7 @@ router.get('/listing/:listingId', checkRole(['Host']), async (req, res) => {
         }
 
         const bookings = await Booking.find({ listingId })
+            .populate('listingId', 'name location price image type')
             .populate('guestId', 'name email')
             .sort({ createdAt: -1 });
 

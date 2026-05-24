@@ -23,7 +23,7 @@
                 Viewing requests for:
             </label>
             <select id="listing-select" class="form-select" style="max-width: 320px; border-radius: 20px; background-color: var(--bg-secondary); border: 1px solid var(--text-primary); font-family: var(--font-sans); font-weight: 600;">
-                <option value="">-- Select Listing --</option>
+                <option value="all">All Listings</option>
             </select>
         </div>
 
@@ -37,10 +37,7 @@
     </div>
 
     <div id="bookings-container">
-        <div class="empty-state">
-            <div class="empty-state-icon">📋</div>
-            <h3>Select a listing above to view its booking requests</h3>
-        </div>
+        <div class="loading"><div class="spinner"></div><span>Loading requests…</span></div>
     </div>
 </div>
 
@@ -79,10 +76,17 @@
                 select.value = preselect;
                 currentListing = listings.find(l => l._id === preselect);
                 loadBookings(preselect);
+            } else {
+                select.value = 'all';
+                currentListing = null;
+                loadBookings('all');
             }
 
             select.addEventListener('change', () => {
-                if (select.value) {
+                if (select.value === 'all') {
+                    currentListing = null;
+                    loadBookings('all');
+                } else if (select.value) {
                     currentListing = listings.find(l => l._id === select.value);
                     loadBookings(select.value);
                 } else {
@@ -113,7 +117,8 @@
         document.getElementById('bookings-container').innerHTML =
             '<div class="loading"><div class="spinner"></div><span>Loading requests…</span></div>';
         try {
-            const bookings = await api('GET', '/bookings/listing/' + listingId);
+            const endpoint = listingId === 'all' ? '/bookings/host' : '/bookings/listing/' + listingId;
+            const bookings = await api('GET', endpoint);
             renderStatsAndBookings(bookings);
         } catch (err) {
             document.getElementById('bookings-container').innerHTML =
@@ -147,10 +152,13 @@
         }
 
         // Render Request Cards (Mockup 15)
-        const listingImgSrc = currentListing && currentListing.image ? currentListing.image : '/images/bedroom-balcony.jpg';
-        const listingType = currentListing ? currentListing.type : 'Type';
-
         container.innerHTML = bookings.map(b => {
+            const listObj   = b.listingId || {};
+            const name      = listObj.name || 'Listing Removed';
+            const location  = listObj.location || 'N/A';
+            const type      = listObj.type || 'N/A';
+            const imgSrc    = listObj.image || '/images/bedroom-balcony.jpg';
+
             const guestName = b.guestId ? b.guestId.name : 'N/A';
             const guestEmail = b.guestId ? b.guestId.email : '—';
             const isPending = b.status === 'pending';
@@ -179,21 +187,21 @@
                     <div class="request-card-content">
                         <!-- Left Image with type ribbon badge -->
                         <div class="booking-img-container">
-                            <img src="${listingImgSrc}" onerror="this.src='/images/bedroom-balcony.jpg'">
-                            <span class="ribbon-badge">${listingType}</span>
+                            <img src="${imgSrc}" onerror="this.src='/images/bedroom-balcony.jpg'">
+                            <span class="ribbon-badge">${type}</span>
                         </div>
 
                         <!-- Right details -->
                         <div class="request-card-info">
                             <div class="request-title-row">
                                 <h3 style="font-family: var(--font-serif); font-size: 1.6rem; font-weight: 500;">
-                                    ${currentListing ? currentListing.name : 'Listing'}
+                                    ${name}
                                 </h3>
                                 ${statusBadge(b.status)}
                             </div>
                             
                             <p style="font-size:0.9rem; color:var(--text-light-muted); margin-bottom: 2px;">
-                                📍 ${currentListing ? currentListing.location : 'Location'} | 📅 ${formatDate(b.startDate)} - ${formatDate(b.endDate)}
+                                📍 ${location} | 📅 ${formatDate(b.startDate)} - ${formatDate(b.endDate)}
                             </p>
                             
                             <!-- Guest Name and Email row -->
