@@ -1098,6 +1098,13 @@ table.admin-table tr:last-child td {
     padding: 40px 24px;
 }
 
+.welcome-page #main-content {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .welcome-card {
     width: 80%;
     max-width: 1100px;
