@@ -7,30 +7,35 @@
     font-weight: 400;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'The Seasons';
     src: url('/fonts/The Seasons Italic.ttf') format('truetype');
     font-weight: 400;
     font-style: italic;
 }
+
 @font-face {
     font-family: 'The Seasons';
     src: url('/fonts/The Seasons Bold.ttf') format('truetype');
     font-weight: 700;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'The Seasons';
     src: url('/fonts/The Seasons Bold Italic.ttf') format('truetype');
     font-weight: 700;
     font-style: italic;
 }
+
 @font-face {
     font-family: 'The Seasons';
     src: url('/fonts/The Seasons Light.ttf') format('truetype');
     font-weight: 300;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'The Seasons';
     src: url('/fonts/The Seasons Light Italic.ttf') format('truetype');
@@ -44,12 +49,14 @@
     font-weight: 400;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'Libre Baskerville';
     src: url('/fonts/LibreBaskerville-Italic.ttf') format('truetype');
     font-weight: 400;
     font-style: italic;
 }
+
 @font-face {
     font-family: 'Libre Baskerville';
     src: url('/fonts/LibreBaskerville-Bold.ttf') format('truetype');
@@ -63,6 +70,7 @@
     font-weight: 400;
     font-style: normal;
 }
+
 @font-face {
     font-family: 'Arial MT';
     src: url('/fonts/arialmtblackitalic.ttf') format('truetype');
@@ -85,6 +93,8 @@
     /* Grey-Tan container (Checkout Select Dates) */
     --bg-card-light: #ffffff;
     /* Plain white for table rows/inputs */
+    --bg-light: #ffffff;
+    /* Solid white for dropdowns/tables */
 
     /* Typography */
     --font-serif: 'Libre Baskerville', 'Playfair Display', Georgia, serif;
@@ -417,26 +427,9 @@ nav#main-nav {
 }
 
 /* ─── Search, Filters & Sorting ─────────────────────────────────────────────── */
-.search-filter-header-row {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-    max-width: 1200px;
-    margin: 0 auto 30px;
-    width: 100%;
-}
-
-.search-filter-header-row .search-pill-container {
-    flex: 1;
-    max-width: 600px;
-    margin: 0;
-}
-
 .search-pill-container {
     position: relative;
-    max-width: 720px;
-    margin: 0 auto 30px;
+    flex: 1;
 }
 
 .search-pill-input {
@@ -528,16 +521,20 @@ nav#main-nav {
         align-items: stretch;
         gap: 12px;
     }
+
     .search-filter-header-row .search-pill-container {
         max-width: 100%;
     }
+
     .search-filter-header-row .dropdown-wrapper {
         width: 100%;
     }
+
     .search-filter-header-row .btn-filter,
     .search-filter-header-row .btn-sort {
         width: 100%;
     }
+
     .dropdown-wrapper .filter-dropdown-card,
     .dropdown-wrapper .sort-dropdown-card {
         right: auto;
@@ -551,12 +548,15 @@ nav#main-nav {
 /* Redesigned filter/sort cards */
 .filter-dropdown-card {
     display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 100;
     background-color: var(--bg-light);
     border: 1px solid var(--border-light);
     border-radius: var(--radius-md);
     padding: 24px 28px;
-    max-width: 440px;
-    margin: -30px auto 30px;
+    width: 340px;
     box-shadow: var(--shadow-medium);
 }
 
@@ -597,12 +597,15 @@ nav#main-nav {
 
 .sort-dropdown-card {
     display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 100;
     background-color: var(--bg-light);
     border: 1px solid var(--border-light);
     border-radius: var(--radius-sm);
     width: 200px;
     padding: 8px 0;
-    margin: -30px auto 30px;
     box-shadow: var(--shadow-medium);
     overflow: hidden;
 }
@@ -627,6 +630,33 @@ nav#main-nav {
 
 .sort-btn-option:hover {
     background-color: rgba(36, 62, 60, 0.05);
+}
+
+@media (max-width: 768px) {
+    .search-controls-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-pill-container {
+        width: 100%;
+    }
+
+    .dropdown-wrapper {
+        width: 100%;
+    }
+
+    .btn-filter,
+    .btn-sort {
+        width: 100%;
+    }
+
+    .filter-dropdown-card,
+    .sort-dropdown-card {
+        width: 100%;
+        right: auto;
+        left: 0;
+    }
 }
 
 /* ─── Forms & Containers ────────────────────────────────────────────────────── */
@@ -732,6 +762,55 @@ nav#main-nav {
     background-color: rgba(0, 0, 0, 0.05);
 }
 
+/* Multiple Image Upload Preview Styles */
+.image-previews-grid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 12px;
+}
+
+.image-preview-item {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1px solid var(--text-primary);
+    box-shadow: var(--shadow-soft);
+}
+
+.image-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-preview-item .remove-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1;
+    padding: 0 0 2px 0;
+    transition: background-color var(--transition);
+}
+
+.image-preview-item .remove-btn:hover {
+    background-color: var(--danger);
+}
+
 /* ─── Cards & Grid System ───────────────────────────────────────────────────── */
 .listing-grid {
     display: grid;
@@ -739,11 +818,13 @@ nav#main-nav {
     gap: 24px;
     padding: 8px 0;
 }
+
 @media (max-width: 1200px) {
     .listing-grid {
         grid-template-columns: repeat(3, 1fr);
     }
 }
+
 @media (max-width: 992px) {
     .listing-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -769,7 +850,8 @@ nav#main-nav {
 
 .listing-img-wrap {
     position: relative;
-    height: 170px; /* Shorter image height matching mockup ratio */
+    height: 170px;
+    /* Shorter image height matching mockup ratio */
     overflow: hidden;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -800,7 +882,8 @@ nav#main-nav {
 }
 
 .listing-info {
-    padding: 20px; /* Slightly shorter padding for a compact layout */
+    padding: 20px;
+    /* Slightly shorter padding for a compact layout */
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -808,7 +891,8 @@ nav#main-nav {
 
 .listing-name {
     font-family: var(--font-serif);
-    font-size: 1.3rem; /* Slightly smaller to fit 4-column layout */
+    font-size: 1.3rem;
+    /* Slightly smaller to fit 4-column layout */
     font-weight: 500;
     margin-bottom: 4px;
 }
@@ -817,11 +901,13 @@ nav#main-nav {
     font-size: 0.85rem;
     font-style: italic;
     color: var(--text-light-muted);
-    margin-bottom: 16px; /* Space before footer */
+    margin-bottom: 16px;
+    /* Space before footer */
 }
 
 .listing-desc {
-    display: none; /* Hide descriptions on card lists to match mockup */
+    display: none;
+    /* Hide descriptions on card lists to match mockup */
 }
 
 .listing-footer {
@@ -846,11 +932,11 @@ nav#main-nav {
 .btn-view-details {
     background-color: #92857a;
     color: var(--text-light);
-    border-radius: 30px; /* Fully rounded pill shape */
+    border-radius: 30px;
+    /* Fully rounded pill shape */
     padding: 8px 20px;
     font-size: 0.85rem;
     font-weight: 600;
-    transition: background var(--transition);
 }
 
 .btn-view-details:hover {
@@ -1021,7 +1107,7 @@ nav#main-nav {
 
 .detail-thumbs-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 16px;
 }
 
@@ -1393,10 +1479,12 @@ table.admin-table tr:last-child td {
 
 .hero-title {
     font-family: 'The Seasons', var(--font-serif);
-    font-size: 4.8rem; /* Elegant, smaller italic size for 'Take it easy' */
+    font-size: 4.8rem;
+    /* Elegant, smaller italic size for 'Take it easy' */
     font-style: italic;
     font-weight: 300;
-    line-height: 0.85; /* Sit tight and flow together */
+    line-height: 0.85;
+    /* Sit tight and flow together */
     margin-bottom: 36px;
     text-transform: none;
 }
@@ -1404,7 +1492,8 @@ table.admin-table tr:last-child td {
 .hero-title span {
     display: block;
     font-family: 'The Seasons', var(--font-serif);
-    font-size: 9.5rem; /* Much larger 'StayEZ' */
+    font-size: 9.5rem;
+    /* Much larger 'StayEZ' */
     font-style: normal;
     font-weight: 400;
     line-height: 0.9;
@@ -1418,7 +1507,8 @@ table.admin-table tr:last-child td {
     font-size: 1.15rem;
     letter-spacing: 2px;
     padding: 14px 56px;
-    border-radius: 50px; /* Pill button */
+    border-radius: 50px;
+    /* Pill button */
     box-shadow: none;
     transition: background var(--transition), transform var(--transition);
 }

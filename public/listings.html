@@ -19,22 +19,22 @@
         </p>
     </div>
 
-    <!-- Search, Filter & Sort Header Row -->
-    <div class="search-filter-header-row">
+    <!-- Search, Filter & Sort Controls Row -->
+    <div class="search-controls-container">
         <!-- Search Bar -->
         <div class="search-pill-container">
             <input type="text" id="search" class="search-pill-input" placeholder="Browse">
             <span class="search-pill-icon">🔍</span>
         </div>
 
-        <!-- Filter Dropdown Wrapper -->
+        <!-- Filter Dropdown wrapper -->
         <div class="dropdown-wrapper">
             <button id="filter-toggle" class="btn btn-filter">Filter <span>∨</span></button>
             <!-- Filter Dropdown Card -->
             <div id="filter-card" class="filter-dropdown-card">
                 <div class="filter-section-title">Location</div>
                 <div class="form-group">
-                    <input type="text" id="filter-location" class="form-input" style="border-radius: 20px; background-color: var(--bg-primary);" placeholder="Search Location...">
+                    <input type="text" id="filter-location" class="form-input" style="border-radius: 20px; background-color: white;" placeholder="Search Location...">
                 </div>
                 <div class="filter-section-title">Type</div>
                 <div class="filter-option-list" id="filter-type-list">
@@ -46,7 +46,7 @@
             </div>
         </div>
 
-        <!-- Sort Dropdown Wrapper -->
+        <!-- Sort Dropdown wrapper -->
         <div class="dropdown-wrapper">
             <button id="sort-toggle" class="btn btn-sort">Sort <span>∨</span></button>
             <!-- Sort Dropdown Card -->
@@ -95,11 +95,11 @@
 
     // Close dropdowns when clicking outside
     document.addEventListener('click', (e) => {
-        if (!filterCard.contains(e.target) && e.target !== filterToggle) {
+        if (!filterCard.contains(e.target) && !filterToggle.contains(e.target)) {
             filterCard.classList.remove('open');
             filterToggle.classList.remove('active');
         }
-        if (!sortCard.contains(e.target) && e.target !== sortToggle) {
+        if (!sortCard.contains(e.target) && !sortToggle.contains(e.target)) {
             sortCard.classList.remove('open');
             sortToggle.classList.remove('active');
         }
