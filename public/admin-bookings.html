@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,108 +8,116 @@
     <meta name="description" content="Administrator view of every booking in the StayEZ system.">
     <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
-<nav id="main-nav"></nav>
+    <nav id="main-nav"></nav>
 
-<div class="page-container">
-    <div style="margin-align: center; text-align: center; margin-bottom: 40px;">
-        <h1 class="page-title" style="font-size: 2.6rem;">All Bookings</h1>
-        <p style="color:var(--text-secondary); margin-top:6px; font-size: 1.05rem;">Manage Bookings of the whole system</p>
-    </div>
-
-    <!-- Redesigned Search & Filter Header (Mockup 18) -->
-    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
-        <div class="search-pill-container" style="margin: 0; max-width: 320px; flex-grow: 1;">
-            <input type="text" id="search" class="search-pill-input" placeholder="Search Bookings..." style="padding: 12px 40px 12px 20px; font-size: 0.95rem;">
-            <span class="search-pill-icon">🔍</span>
+    <div class="page-container">
+        <div style="margin-align: center; text-align: center; margin-bottom: 40px;">
+            <h1 class="page-title" style="font-size: 2.6rem;">All Bookings</h1>
+            <p style="color:var(--text-secondary); margin-top:6px; font-size: 1.05rem;">Manage Bookings of the whole
+                system</p>
         </div>
-        <button id="status-filter-toggle" class="btn btn-filter" style="font-size: 0.95rem; padding: 10px 24px; min-width: auto; border-radius: 20px;">Status <span>∨</span></button>
+
+        <!-- Redesigned Search & Filter Header (Mockup 18) -->
+        <div
+            style="display: flex; align-items: center; justify-content: flex-end; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+            <div class="search-pill-container" style="margin: 0; max-width: 320px; flex-grow: 1;">
+                <input type="text" id="search" class="search-pill-input" placeholder="Search Bookings..."
+                    style="padding: 12px 40px 12px 20px; font-size: 0.95rem;">
+                <span class="search-pill-icon">🔍</span>
+            </div>
+            <button id="status-filter-toggle" class="btn btn-filter"
+                style="font-size: 0.95rem; padding: 10px 24px; min-width: auto; border-radius: 20px;">Status
+                <span>∨</span></button>
+        </div>
+
+        <!-- Status Dropdown Card -->
+        <div id="status-card" class="sort-dropdown-card" style="margin: -14px 0 24px auto; width: 160px;">
+            <button class="sort-btn-option" data-value="">All Statuses</button>
+            <button class="sort-btn-option" data-value="pending">Pending</button>
+            <button class="sort-btn-option" data-value="approved">Approved</button>
+            <button class="sort-btn-option" data-value="rejected">Rejected</button>
+        </div>
+
+        <div id="bookings-container">
+            <div class="loading">
+                <div class="spinner"></div><span>Loading all bookings…</span>
+            </div>
+        </div>
     </div>
 
-    <!-- Status Dropdown Card -->
-    <div id="status-card" class="sort-dropdown-card" style="margin: -14px 0 24px auto; width: 160px;">
-        <button class="sort-btn-option" data-value="">All Statuses</button>
-        <button class="sort-btn-option" data-value="pending">Pending</button>
-        <button class="sort-btn-option" data-value="approved">Approved</button>
-        <button class="sort-btn-option" data-value="rejected">Rejected</button>
-    </div>
+    <script src="/app.js"></script>
+    <script>
+        const user = requireAuth(['Admin']);
+        let allBookings = [];
+        let selectedStatus = "";
 
-    <div id="bookings-container">
-        <div class="loading"><div class="spinner"></div><span>Loading all bookings…</span></div>
-    </div>
-</div>
+        if (user) { renderNav('/admin-bookings.html'); loadBookings(); }
 
-<script src="/app.js"></script>
-<script>
-    const user = requireAuth(['Admin']);
-    let allBookings = [];
-    let selectedStatus = "";
+        // Toggle Status Dropdown
+        const statusToggle = document.getElementById('status-filter-toggle');
+        const statusCard = document.getElementById('status-card');
 
-    if (user) { renderNav('/admin-bookings.html'); loadBookings(); }
+        statusToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            statusCard.classList.toggle('open');
+            statusToggle.classList.toggle('active');
+        });
 
-    // Toggle Status Dropdown
-    const statusToggle = document.getElementById('status-filter-toggle');
-    const statusCard = document.getElementById('status-card');
+        document.addEventListener('click', (e) => {
+            if (!statusCard.contains(e.target) && e.target !== statusToggle) {
+                statusCard.classList.remove('open');
+                statusToggle.classList.remove('active');
+            }
+        });
 
-    statusToggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        statusCard.classList.toggle('open');
-        statusToggle.classList.toggle('active');
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!statusCard.contains(e.target) && e.target !== statusToggle) {
-            statusCard.classList.remove('open');
-            statusToggle.classList.remove('active');
-        }
-    });
-
-    async function loadBookings() {
-        document.getElementById('bookings-container').innerHTML =
-            '<div class="loading"><div class="spinner"></div><span>Loading…</span></div>';
-        try {
-            allBookings = await api('GET', '/bookings');
-            filterAndRenderBookings();
-        } catch (err) {
+        async function loadBookings() {
             document.getElementById('bookings-container').innerHTML =
-                `<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>${err.message}</h3></div>`;
-        }
-    }
-
-    function filterAndRenderBookings() {
-        const searchVal = document.getElementById('search').value.toLowerCase().trim();
-        
-        let filtered = allBookings;
-
-        if (selectedStatus) {
-            filtered = filtered.filter(b => b.status === selectedStatus);
+                '<div class="loading"><div class="spinner"></div><span>Loading…</span></div>';
+            try {
+                allBookings = await api('GET', '/bookings');
+                filterAndRenderBookings();
+            } catch (err) {
+                document.getElementById('bookings-container').innerHTML =
+                    `<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>${err.message}</h3></div>`;
+            }
         }
 
-        if (searchVal) {
-            filtered = filtered.filter(b => {
-                const guestName = b.guestId ? b.guestId.name.toLowerCase() : '';
-                const listingName = b.listingId ? b.listingId.name.toLowerCase() : '';
-                const bookingId = b._id.toLowerCase();
-                return guestName.includes(searchVal) || listingName.includes(searchVal) || bookingId.includes(searchVal);
-            });
+        function filterAndRenderBookings() {
+            const searchVal = document.getElementById('search').value.toLowerCase().trim();
+
+            let filtered = allBookings;
+
+            if (selectedStatus) {
+                filtered = filtered.filter(b => b.status === selectedStatus);
+            }
+
+            if (searchVal) {
+                filtered = filtered.filter(b => {
+                    const guestName = b.guestId ? b.guestId.name.toLowerCase() : '';
+                    const listingName = b.listingId ? b.listingId.name.toLowerCase() : '';
+                    const bookingId = b._id.toLowerCase();
+                    return guestName.includes(searchVal) || listingName.includes(searchVal) || bookingId.includes(searchVal);
+                });
+            }
+
+            renderBookings(filtered);
         }
 
-        renderBookings(filtered);
-    }
-
-    function renderBookings(bookings) {
-        const container = document.getElementById('bookings-container');
-        if (!bookings.length) {
-            container.innerHTML = `
+        function renderBookings(bookings) {
+            const container = document.getElementById('bookings-container');
+            if (!bookings.length) {
+                container.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state-icon">📭</div>
                     <h3>No bookings found</h3>
                     <p>Try adjusting your search or filters.</p>
                 </div>`;
-            return;
-        }
+                return;
+            }
 
-        container.innerHTML = `
+            container.innerHTML = `
             <div class="table-wrap">
                 <table class="admin-table">
                     <thead>
@@ -123,10 +132,10 @@
                     </thead>
                     <tbody>
                         ${bookings.map(b => {
-                            const bookingIdShort = b._id.substring(b._id.length - 8).toUpperCase();
-                            const guestName = b.guestId ? b.guestId.name : 'N/A';
-                            const listingName = b.listingId ? b.listingId.name : 'Listing Removed';
-                            return `
+                const bookingIdShort = b._id.substring(b._id.length - 8).toUpperCase();
+                const guestName = b.guestId ? b.guestId.name : 'N/A';
+                const listingName = b.listingId ? b.listingId.name : 'Listing Removed';
+                return `
                             <tr>
                                 <td><span style="font-family: monospace; font-weight: 700; color: var(--text-secondary);">#${bookingIdShort}</span></td>
                                 <td><strong>${guestName}</strong></td>
@@ -139,31 +148,32 @@
                                     </span>
                                 </td>
                             </tr>`;
-                        }).join('')}
+            }).join('')}
                     </tbody>
                 </table>
             </div>`;
-    }
+        }
 
-    // Event wiring
-    document.getElementById('search').addEventListener('input', filterAndRenderBookings);
+        // Event wiring
+        document.getElementById('search').addEventListener('input', filterAndRenderBookings);
 
-    const statusOptions = document.querySelectorAll('#status-card .sort-btn-option');
-    statusOptions.forEach(opt => {
-        opt.addEventListener('click', () => {
-            statusOptions.forEach(o => o.classList.remove('selected'));
-            opt.classList.add('selected');
-            selectedStatus = opt.getAttribute('data-value');
-            
-            statusCard.classList.remove('open');
-            statusToggle.classList.remove('active');
-            
-            // Update Toggle Button Text
-            statusToggle.innerHTML = `${opt.textContent} <span>∨</span>`;
-            
-            filterAndRenderBookings();
+        const statusOptions = document.querySelectorAll('#status-card .sort-btn-option');
+        statusOptions.forEach(opt => {
+            opt.addEventListener('click', () => {
+                statusOptions.forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                selectedStatus = opt.getAttribute('data-value');
+
+                statusCard.classList.remove('open');
+                statusToggle.classList.remove('active');
+
+                // Update Toggle Button Text
+                statusToggle.innerHTML = `${opt.textContent} <span>∨</span>`;
+
+                filterAndRenderBookings();
+            });
         });
-    });
-</script>
+    </script>
 </body>
+
 </html>
