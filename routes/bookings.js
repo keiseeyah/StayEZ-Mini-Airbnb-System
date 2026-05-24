@@ -27,9 +27,9 @@ router.post('/', checkRole(['Guest']), async (req, res) => {
             return res.status(400).json({ message: 'Check-out must be after check-in.' });
         }
 
-        // ── Verify listing exists ─────────────────────────────────────────────
+        // ── Verify listing exists and is not removed ──────────────────────────
         const listing = await Listing.findById(listingId);
-        if (!listing) return res.status(404).json({ message: 'Listing not found.' });
+        if (!listing || listing.isRemoved) return res.status(404).json({ message: 'Listing not found.' });
 
         // ── Date-Range Overlap Check (against ALL approved bookings) ──────────
         const approvedBookings = await Booking.find({ listingId, status: 'approved' });
@@ -42,7 +42,17 @@ router.post('/', checkRole(['Guest']), async (req, res) => {
             });
         }
 
-        const booking = new Booking({ listingId, guestId, startDate: start, endDate: end, status: 'pending' });
+        const booking = new Booking({
+            listingId,
+            guestId,
+            startDate: start,
+            endDate: end,
+            status: 'pending',
+            listingName: listing.name,
+            listingLocation: listing.location,
+            listingType: listing.type,
+            listingImage: listing.image
+        });
         const saved   = await booking.save();
         res.status(201).json(saved);
     } catch (err) {
@@ -176,6 +186,24 @@ router.get('/', checkRole(['Admin']), async (req, res) => {
         res.status(200).json(bookings);
     } catch (err) {
         res.status(500).json({ message: 'Error fetching all bookings.', error: err.message });
+    }
+});
+
+// ─── DELETE /api/bookings/:id ─── Guest cancels/deletes their booking ─────────
+router.delete('/:id', checkRole(['Guest']), async (req, res) => {
+    try {
+        const booking = await Booking.findById(req.params.id);
+        if (!booking) return res.status(404).json({ message: 'Booking not found.' });
+
+        // Verify this booking belongs to the logged-in Guest
+        if (booking.guestId.toString() !== req.userId) {
+            return res.status(403).json({ message: 'You do not own this booking.' });
+        }
+
+        await Booking.findByIdAndDelete(req.params.id);
+        res.status(200).json({ message: 'Booking deleted successfully.' });
+    } catch (err) {
+        res.status(500).json({ message: 'Error deleting booking.', error: err.message });
     }
 });
 

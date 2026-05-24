@@ -37,8 +37,13 @@ const listingSchema = new mongoose.Schema({
     contactNumber: {
         type: String,
         required: true
+    },
+    isRemoved: {
+        type: Boolean,
+        default: false
     }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Listing', listingSchema);
+
 

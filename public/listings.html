@@ -37,6 +37,7 @@
                 </div>
                 <div class="filter-section-title">Type</div>
                 <div class="filter-option-list" id="filter-type-list">
+                    <div class="filter-option selected" data-value="">All Types</div>
                     <div class="filter-option" data-value="hotel">Hotel</div>
                     <div class="filter-option" data-value="apartment">Apartment</div>
                     <div class="filter-option" data-value="dorm">Dorm</div>
@@ -153,8 +154,13 @@
     typeOptions.forEach(opt => {
         opt.addEventListener('click', () => {
             if (opt.classList.contains('selected')) {
+                if (opt.getAttribute('data-value') === "") {
+                    return;
+                }
                 opt.classList.remove('selected');
                 selectedType = "";
+                const allTypesOpt = Array.from(typeOptions).find(o => o.getAttribute('data-value') === "");
+                if (allTypesOpt) allTypesOpt.classList.add('selected');
             } else {
                 typeOptions.forEach(o => o.classList.remove('selected'));
                 opt.classList.add('selected');

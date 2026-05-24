@@ -21,23 +21,24 @@
 
         <!-- Redesigned Search & Filter Header (Mockup 18) -->
         <div
-            style="display: flex; align-items: center; justify-content: flex-end; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+            style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
             <div class="search-pill-container" style="margin: 0; max-width: 320px; flex-grow: 1;">
                 <input type="text" id="search" class="search-pill-input" placeholder="Search Bookings..."
                     style="padding: 12px 40px 12px 20px; font-size: 0.95rem;">
                 <span class="search-pill-icon">🔍</span>
             </div>
-            <button id="status-filter-toggle" class="btn btn-filter"
-                style="font-size: 0.95rem; padding: 10px 24px; min-width: auto; border-radius: 20px;">Status
-                <span>∨</span></button>
-        </div>
-
-        <!-- Status Dropdown Card -->
-        <div id="status-card" class="sort-dropdown-card" style="margin: -14px 0 24px auto; width: 160px;">
-            <button class="sort-btn-option" data-value="">All Statuses</button>
-            <button class="sort-btn-option" data-value="pending">Pending</button>
-            <button class="sort-btn-option" data-value="approved">Approved</button>
-            <button class="sort-btn-option" data-value="rejected">Rejected</button>
+            <div class="dropdown-wrapper">
+                <button id="status-filter-toggle" class="btn btn-filter"
+                    style="font-size: 0.95rem; padding: 10px 24px; min-width: auto; border-radius: 20px;">Status
+                    <span>∨</span></button>
+                <!-- Status Dropdown Card -->
+                <div id="status-card" class="sort-dropdown-card" style="right: 0; width: 160px;">
+                    <button class="sort-btn-option" data-value="">All Statuses</button>
+                    <button class="sort-btn-option" data-value="pending">Pending</button>
+                    <button class="sort-btn-option" data-value="approved">Approved</button>
+                    <button class="sort-btn-option" data-value="rejected">Rejected</button>
+                </div>
+            </div>
         </div>
 
         <div id="bookings-container">
@@ -66,7 +67,7 @@
         });
 
         document.addEventListener('click', (e) => {
-            if (!statusCard.contains(e.target) && e.target !== statusToggle) {
+            if (!statusCard.contains(e.target) && !statusToggle.contains(e.target)) {
                 statusCard.classList.remove('open');
                 statusToggle.classList.remove('active');
             }

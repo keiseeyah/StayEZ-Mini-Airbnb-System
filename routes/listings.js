@@ -7,7 +7,7 @@ const checkRole = require('../middleware/roleCheck');
 // MUST be defined BEFORE /:id to prevent "host" being parsed as a MongoDB ID
 router.get('/host', checkRole(['Host']), async (req, res) => {
     try {
-        const listings = await Listing.find({ hostId: req.userId });
+        const listings = await Listing.find({ hostId: req.userId, isRemoved: { $ne: true } });
         res.status(200).json(listings);
     } catch (err) {
         res.status(500).json({ message: 'Error fetching your listings.', error: err.message });
@@ -18,7 +18,7 @@ router.get('/host', checkRole(['Host']), async (req, res) => {
 router.get('/', async (req, res) => {
     try {
         const { search, location, type, sort } = req.query;
-        const query = {};
+        const query = { isRemoved: { $ne: true } };
 
         if (search)   query.name     = { $regex: search,   $options: 'i' };
         if (location) query.location = { $regex: location, $options: 'i' };
@@ -51,7 +51,7 @@ router.post('/', checkRole(['Host']), async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const listing = await Listing.findById(req.params.id);
-        if (!listing) return res.status(404).json({ message: 'Listing not found.' });
+        if (!listing || listing.isRemoved) return res.status(404).json({ message: 'Listing not found.' });
         res.status(200).json(listing);
     } catch (err) {
         res.status(500).json({ message: 'Error fetching listing.', error: err.message });
@@ -78,14 +78,15 @@ router.put('/:id', checkRole(['Host']), async (req, res) => {
 router.delete('/:id', checkRole(['Host', 'Admin']), async (req, res) => {
     try {
         const listing = await Listing.findById(req.params.id);
-        if (!listing) return res.status(404).json({ message: 'Listing not found.' });
+        if (!listing || listing.isRemoved) return res.status(404).json({ message: 'Listing not found.' });
 
         // Hosts may only delete their own listing
         if (req.userRole === 'Host' && listing.hostId.toString() !== req.userId) {
             return res.status(403).json({ message: 'You do not own this listing.' });
         }
 
-        await Listing.findByIdAndDelete(req.params.id);
+        listing.isRemoved = true;
+        await listing.save();
         res.status(200).json({ message: 'Listing deleted successfully.' });
     } catch (err) {
         res.status(500).json({ message: 'Error deleting listing.', error: err.message });

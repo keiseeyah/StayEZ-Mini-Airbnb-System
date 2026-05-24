@@ -934,6 +934,14 @@ nav#main-nav {
     box-shadow: var(--shadow-soft);
     margin-bottom: 24px;
 }
+.booking-card.removed {
+    background-color: #4b5553 !important;
+    opacity: 0.85;
+    border: 1px dashed rgba(255, 255, 255, 0.25);
+}
+.booking-card.removed .status-pill {
+    opacity: 0.8;
+}
 
 .booking-card-main {
     display: flex;
@@ -1009,6 +1017,7 @@ nav#main-nav {
     letter-spacing: 1px;
     text-transform: uppercase;
     border: 1.5px solid var(--text-light);
+    color: var(--text-light);
 }
 
 .status-pill.pending {

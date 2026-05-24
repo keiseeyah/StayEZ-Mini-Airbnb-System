@@ -17,20 +17,21 @@
     </div>
 
     <!-- Redesigned Search & Filter Header (Mockup 17) -->
-    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
         <div class="search-pill-container" style="margin: 0; max-width: 320px; flex-grow: 1;">
             <input type="text" id="search" class="search-pill-input" placeholder="Search Users..." style="padding: 12px 40px 12px 20px; font-size: 0.95rem;">
             <span class="search-pill-icon">🔍</span>
         </div>
-        <button id="role-filter-toggle" class="btn btn-filter" style="font-size: 0.95rem; padding: 10px 24px; min-width: auto; border-radius: 20px;">Role <span>∨</span></button>
-    </div>
-
-    <!-- Role Filter Dropdown Card -->
-    <div id="role-card" class="sort-dropdown-card" style="margin: -14px 0 24px auto; width: 160px;">
-        <button class="sort-btn-option" data-value="">All Roles</button>
-        <button class="sort-btn-option" data-value="Guest">Guest</button>
-        <button class="sort-btn-option" data-value="Host">Host</button>
-        <button class="sort-btn-option" data-value="Admin">Admin</button>
+        <div class="dropdown-wrapper">
+            <button id="role-filter-toggle" class="btn btn-filter" style="font-size: 0.95rem; padding: 10px 24px; min-width: auto; border-radius: 20px;">Role <span>∨</span></button>
+            <!-- Role Filter Dropdown Card -->
+            <div id="role-card" class="sort-dropdown-card" style="right: 0; width: 160px;">
+                <button class="sort-btn-option" data-value="">All Roles</button>
+                <button class="sort-btn-option" data-value="Guest">Guest</button>
+                <button class="sort-btn-option" data-value="Host">Host</button>
+                <button class="sort-btn-option" data-value="Admin">Admin</button>
+            </div>
+        </div>
     </div>
 
     <div id="users-container">
@@ -57,7 +58,7 @@
     });
 
     document.addEventListener('click', (e) => {
-        if (!roleCard.contains(e.target) && e.target !== roleToggle) {
+        if (!roleCard.contains(e.target) && !roleToggle.contains(e.target)) {
             roleCard.classList.remove('open');
             roleToggle.classList.remove('active');
         }

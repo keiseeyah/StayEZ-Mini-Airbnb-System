@@ -380,7 +380,8 @@
 
     /* ─ Delete ─────────────────────────────────────────────────────────────── */
     async function deleteListing(id) {
-        if (!confirm('Delete this listing? This cannot be undone.')) return;
+        const confirmed = await showConfirm('Delete Listing?', 'Are you sure you want to delete this listing? This cannot be undone.');
+        if (!confirmed) return;
         try {
             await api('DELETE', '/listings/' + id);
             showToast('Listing deleted.', 'success');
