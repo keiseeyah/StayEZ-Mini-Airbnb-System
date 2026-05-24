@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StayEZ — Listing Details</title>
+    <meta name="description" content="View details for this accommodation on StayEZ.">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav id="main-nav"></nav>
+
+<div class="page-container" id="detail-container">
+    <div class="loading"><div class="spinner"></div><span>Loading property details…</span></div>
+</div>
+
+<script src="/app.js"></script>
+<script>
+    const user = getUser();
+    renderNav('/listings.html');
+
+    const params = new URLSearchParams(window.location.search);
+    const listingId = params.get('id');
+
+    if (!listingId) {
+        document.getElementById('detail-container').innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">❌</div>
+                <h3>No property specified</h3>
+                <a href="/listings.html" class="btn btn-primary" style="margin-top:16px">Browse Listings</a>
+            </div>`;
+    } else {
+        loadListingDetails(listingId);
+    }
+
+    async function loadListingDetails(id) {
+        try {
+            const listing = await api('GET', '/listings/' + id);
+            renderDetails(listing);
+        } catch (err) {
+            document.getElementById('detail-container').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">⚠️</div>
+                    <h3>Property not found</h3>
+                    <p>${err.message}</p>
+                </div>`;
+        }
+    }
+
+    function renderDetails(listing) {
+        const price = listing.price ? `₱${Number(listing.price).toLocaleString()}` : 'N/A';
+        const img1 = listing.image || '/images/bedroom-balcony.jpg';
+        
+        // Stock related images to fill the thumbnail grid visually matching mockup 9
+        const img2 = '/images/bedroom-closet.jpg';
+        const img3 = '/images/home-bg.jpg';
+        const img4 = '/images/login-bg.jpg';
+
+        document.getElementById('detail-container').innerHTML = `
+            <!-- Back Arrow Navigation -->
+            <button class="back-btn-circle" onclick="window.history.back()">⬅</button>
+
+            <div class="detail-layout">
+                <!-- Left Column: Primary Image & Thumbs Grid -->
+                <div class="detail-images-section">
+                    <img id="primary-view-img" src="${img1}" 
+                         onerror="this.src='/images/bedroom-balcony.jpg'"
+                         class="detail-primary-image" alt="${listing.name}">
+                    
+                    <div class="detail-thumbs-grid">
+                        <img src="${img1}" class="detail-thumb" onclick="swapImage(this.src)">
+                        <img src="${img2}" class="detail-thumb" onclick="swapImage(this.src)">
+                        <img src="${img3}" class="detail-thumb" onclick="swapImage(this.src)">
+                    </div>
+                </div>
+
+                <!-- Right Column: Information, Description & Book Now -->
+                <div class="detail-info-section">
+                    <div class="detail-header-row">
+                        <div>
+                            <span class="listing-type-badge inline" style="margin-bottom: 8px;">${listing.type}</span>
+                            <h1 class="page-title" style="font-size: 2.2rem;">${listing.name}</h1>
+                            <p style="color:var(--text-secondary); margin-top:6px; font-size:1.05rem; font-style: italic;">
+                                📍 ${listing.location}
+                            </p>
+                        </div>
+                        <div class="detail-price-badge">
+                            ${price}/night
+                        </div>
+                    </div>
+
+                    <div class="detail-desc">
+                        ${listing.description || 'No description provided.'}
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; margin-top: 40px;">
+                        <button id="book-btn" class="btn btn-primary btn-lg" style="border-radius: 30px; letter-spacing: 0.5px;">
+                            BOOK NOW
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('book-btn').addEventListener('click', () => {
+            if (!user) {
+                showToast('Please log in as a Guest to book stays.', 'info');
+                setTimeout(() => window.location.href = '/index.html', 1500);
+                return;
+            }
+            if (user.role !== 'Guest') {
+                showToast(`Hosts and Admins cannot book stays. Log in as Guest.`, 'error');
+                return;
+            }
+            window.location.href = `/book.html?id=${listing._id}`;
+        });
+    }
+
+    function swapImage(src) {
+        document.getElementById('primary-view-img').src = src;
+    }
+</script>
+</body>
+</html>

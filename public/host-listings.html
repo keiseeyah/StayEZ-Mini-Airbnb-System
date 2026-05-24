@@ -10,82 +10,94 @@
 <body>
 <nav id="main-nav"></nav>
 
-<!-- ─ Create / Edit Listing Modal ─────────────────────────────────────────── -->
-<div class="modal-overlay" id="listing-modal">
-    <div class="modal">
-        <div class="modal-header">
-            <h2 class="modal-title" id="modal-title">Create New Listing</h2>
-            <button class="modal-close" onclick="closeModal()">×</button>
-        </div>
-        <form id="listing-form" novalidate>
-            <input type="hidden" id="listing-id">
-            <div class="form-group">
-                <label class="form-label" for="f-name">Property Name</label>
-                <input type="text" id="f-name" class="form-input" placeholder="e.g. Cozy Beachside Studio" required>
+<div class="page-container">
+    
+    <!-- ── LISTINGS GRID VIEW (Mockup 6) ── -->
+    <div id="view-listings-list">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">My Listings</h1>
+                <p style="color:var(--text-secondary); margin-top:4px;">Create and manage your properties</p>
             </div>
-            <div class="form-row">
+            <button onclick="openCreateView()" class="btn btn-outline" style="border-radius: 20px;">+ Create Listing</button>
+        </div>
+
+        <div id="listings-container">
+            <div class="loading"><div class="spinner"></div><span>Loading your listings…</span></div>
+        </div>
+    </div>
+
+    <!-- ── FORM VIEW (Mockups 11, 12, 13, 14) ── -->
+    <div id="view-listing-form-container" style="display: none;">
+        <!-- Back Arrow -->
+        <button class="back-btn-circle" onclick="showListingsView()">⬅</button>
+
+        <div style="margin-bottom: 32px;">
+            <h1 class="page-title" id="form-view-title">Create Listing</h1>
+            <p style="color:var(--text-secondary); margin-top:4px;">Share your space and host unforgettable experiences</p>
+        </div>
+
+        <!-- Form Card wrapper -->
+        <div id="form-card-theme" class="form-card">
+            <form id="listing-form" novalidate>
+                <input type="hidden" id="listing-id">
+                
+                <h3 style="font-family: var(--font-serif); font-size: 1.5rem; text-align: center; margin-bottom: 30px; font-weight: 500;">
+                    Enter Listing Details:
+                </h3>
+
                 <div class="form-group">
-                    <label class="form-label" for="f-type">Type</label>
-                    <select id="f-type" class="form-select" required>
-                        <option value="" disabled selected>Select type</option>
-                        <option value="hotel">Hotel</option>
-                        <option value="apartment">Apartment</option>
-                        <option value="dorm">Dorm</option>
-                        <option value="guest_room">Guest Room</option>
-                    </select>
+                    <label class="form-label" for="f-name">NAME</label>
+                    <input type="text" id="f-name" class="form-input" placeholder="e.g. Cozy Beachside Studio" required>
                 </div>
+
                 <div class="form-group">
-                    <label class="form-label" for="f-price">Price / Night (₱)</label>
+                    <label class="form-label">TYPE</label>
+                    <div class="checkbox-grid">
+                        <label class="checkbox-item"><input type="checkbox" name="type-opt" value="hotel"> Hotel</label>
+                        <label class="checkbox-item"><input type="checkbox" name="type-opt" value="apartment"> Apartment</label>
+                        <label class="checkbox-item"><input type="checkbox" name="type-opt" value="dorm"> Dorm</label>
+                        <label class="checkbox-item"><input type="checkbox" name="type-opt" value="guest_room"> Guestroom</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="f-location">LOCATION</label>
+                    <input type="text" id="f-location" class="form-input" placeholder="e.g. Makati City, Metro Manila" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="f-price">PRICE (per night)</label>
                     <input type="number" id="f-price" class="form-input" placeholder="e.g. 1500" min="0" step="1" required>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="f-location">Location</label>
-                <input type="text" id="f-location" class="form-input" placeholder="e.g. Makati City, Metro Manila" required>
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="f-description">Description</label>
-                <textarea id="f-description" class="form-textarea" placeholder="Describe your property…" required></textarea>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Property Image <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
-                <div class="image-upload-zone" id="image-drag-area">
-                    <input type="file" id="f-image-file" accept="image/jpeg, image/png, image/webp" style="display: none;">
-                    <div class="upload-zone-content" id="upload-placeholder">
-                        <span class="upload-icon">📸</span>
-                        <p class="upload-text">Click or drag image to upload</p>
-                        <p class="upload-subtext">JPG, PNG or WEBP (automatically optimized)</p>
-                    </div>
-                    <div class="upload-zone-preview" id="upload-preview-container" style="display: none;">
-                        <img id="upload-preview-img" src="" alt="Property Preview">
-                        <button type="button" class="btn-remove-image" id="btn-remove-img" title="Remove image">×</button>
+
+                <div class="form-group">
+                    <label class="form-label" for="f-description">DESCRIPTION</label>
+                    <textarea id="f-description" class="form-textarea" placeholder="Describe your property details…" required></textarea>
+                </div>
+
+                <!-- Attachment Upload Image Picker -->
+                <div class="form-group">
+                    <label class="form-label" for="f-image-text">IMAGE</label>
+                    <div class="input-with-attachment">
+                        <input type="text" id="f-image-text" class="form-input" placeholder="Upload property image..." readonly required>
+                        <button type="button" class="attachment-btn" onclick="document.getElementById('f-image-file').click()">📎</button>
+                        <input type="file" id="f-image-file" accept="image/jpeg, image/png, image/webp" style="display: none;">
                     </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="f-contact">Contact Number</label>
-                <input type="tel" id="f-contact" class="form-input" placeholder="09XX-XXX-XXXX" required>
-            </div>
-            <div id="modal-error" class="error-box"></div>
-            <div style="display:flex; gap:10px;">
-                <button type="button" onclick="closeModal()" class="btn btn-outline" style="flex:1">Cancel</button>
-                <button type="submit" id="modal-submit" class="btn btn-primary" style="flex:2">Create Listing</button>
-            </div>
-        </form>
-    </div>
-</div>
 
-<div class="page-container">
-    <div class="page-header">
-        <div>
-            <h1 class="page-title">My <span>Listings</span></h1>
-            <p style="color:var(--text-secondary); margin-top:4px;">Create and manage your properties</p>
+                <div class="form-group" style="margin-bottom: 36px;">
+                    <label class="form-label" for="f-contact">Contact Number</label>
+                    <input type="tel" id="f-contact" class="form-input" placeholder="09XX-XXX-XXXX" required>
+                </div>
+
+                <div id="form-error" class="error-box" style="margin-bottom: 24px;"></div>
+
+                <button type="submit" id="form-submit-btn" class="btn btn-full btn-lg" style="letter-spacing: 0.5px;">
+                    POSTLISTING
+                </button>
+            </form>
         </div>
-        <button onclick="openCreateModal()" class="btn btn-primary">+ Add Listing</button>
-    </div>
-
-    <div id="listings-container">
-        <div class="loading"><div class="spinner"></div><span>Loading your listings…</span></div>
     </div>
 </div>
 
@@ -93,101 +105,38 @@
 <script>
     const user = requireAuth(['Host']);
     let editingId = null;
+    let currentListingImage = '';
 
     if (user) { renderNav('/host-listings.html'); loadListings(); }
 
-    /* ─ Load & Render ─────────────────────────────────────────────────────── */
-    async function loadListings() {
-        try {
-            const listings = await api('GET', '/listings/host');
-            renderListings(listings);
-        } catch (err) {
-            document.getElementById('listings-container').innerHTML =
-                `<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>${err.message}</h3></div>`;
+    /* ─ Checkbox Radio behavior ─────────────────────────────────────────────── */
+    const typeCheckboxes = document.querySelectorAll('input[name="type-opt"]');
+    typeCheckboxes.forEach(cb => {
+        cb.addEventListener('change', () => {
+            if (cb.checked) {
+                typeCheckboxes.forEach(other => { if (other !== cb) other.checked = false; });
+            }
+        });
+    });
+
+    /* ─ Image Attachment Logic ─────────────────────────────────────────────── */
+    const fileInput = document.getElementById('f-image-file');
+    const filenameInput = document.getElementById('f-image-text');
+
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            filenameInput.value = file.name;
+            handleImageUpload(file);
         }
-    }
+    });
 
-    function renderListings(listings) {
-        const c = document.getElementById('listings-container');
-        if (!listings.length) {
-            c.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-state-icon">🏡</div>
-                    <h3>No listings yet</h3>
-                    <p>Create your first property to start accepting bookings.</p>
-                    <button onclick="openCreateModal()" class="btn btn-primary" style="margin-top:20px">+ Add Listing</button>
-                </div>`;
-            return;
-        }
-
-        c.innerHTML = `<div class="listing-grid">` +
-            listings.map(l => {
-                const price  = l.price ? `₱${Number(l.price).toLocaleString()}` : '—';
-                const imgSrc = l.image || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=500';
-                return `
-                    <div class="listing-card">
-                        <div class="listing-img-wrap">
-                            <img src="${imgSrc}"
-                                 onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=500'"
-                                 alt="${l.name}" loading="lazy">
-                            <span class="listing-type-badge">${l.type}</span>
-                        </div>
-                        <div class="listing-info">
-                            <h3 class="listing-name">${l.name}</h3>
-                            <p class="listing-location">📍 ${l.location}</p>
-                            <p class="listing-desc">${l.description}</p>
-                            <div class="listing-footer">
-                                <span class="listing-price">${price}<small>/night</small></span>
-                                <div class="listing-actions">
-                                    <a href="/host-bookings.html?listing=${l._id}" class="btn btn-outline btn-sm">Requests</a>
-                                    <button onclick='openEditModal(${JSON.stringify(l).replace(/'/g,"&#39;")})' class="btn btn-outline btn-sm">Edit</button>
-                                    <button onclick="deleteListing('${l._id}')" class="btn btn-danger btn-sm">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>`;
-            }).join('') + `</div>`;
-    }
-
-    /* ─ Image Upload Logic & State ─────────────────────────────────────────── */
-    let currentListingImage = '';
-
-    function updateImagePreview(src) {
-        const placeholder = document.getElementById('upload-placeholder');
-        const previewContainer = document.getElementById('upload-preview-container');
-        const previewImg = document.getElementById('upload-preview-img');
-        const fileInput = document.getElementById('f-image-file');
-
-        if (src) {
-            previewImg.src = src;
-            placeholder.style.display = 'none';
-            previewContainer.style.display = 'flex';
-        } else {
-            previewImg.src = '';
-            placeholder.style.display = 'flex';
-            previewContainer.style.display = 'none';
-            fileInput.value = ''; // Reset file input
-        }
-    }
-
-    function removeImage() {
-        currentListingImage = '';
-        updateImagePreview('');
-    }
-
-    async function handleImageFile(file) {
-        if (!file) return;
-        if (!file.type.startsWith('image/')) {
-            showToast('Please select an image file.', 'error');
-            return;
-        }
-
+    async function handleImageUpload(file) {
         const reader = new FileReader();
         reader.onload = function(e) {
             const img = new Image();
             img.onload = function() {
-                // Resize & compress image on client-side
-                const maxDim = 1000;
+                const maxDim = 800;
                 let width = img.width;
                 let height = img.height;
 
@@ -207,122 +156,157 @@
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // Export as compressed jpeg base64
-                currentListingImage = canvas.toDataURL('image/jpeg', 0.8);
-                updateImagePreview(currentListingImage);
-            };
-            img.onerror = function() {
-                showToast('Failed to load image file.', 'error');
+                currentListingImage = canvas.toDataURL('image/jpeg', 0.85);
             };
             img.src = e.target.result;
-        };
-        reader.onerror = function() {
-            showToast('Failed to read image file.', 'error');
         };
         reader.readAsDataURL(file);
     }
 
-    // Set up upload zone event listeners
-    const dragArea = document.getElementById('image-drag-area');
-    const fileInput = document.getElementById('f-image-file');
-    const removeBtn = document.getElementById('btn-remove-img');
-
-    dragArea.addEventListener('click', (e) => {
-        if (e.target.closest('#btn-remove-img')) return;
-        fileInput.click();
-    });
-
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) {
-            handleImageFile(e.target.files[0]);
+    /* ─ Load & Render Listings ─────────────────────────────────────────────── */
+    async function loadListings() {
+        try {
+            const listings = await api('GET', '/listings/host');
+            renderListings(listings);
+        } catch (err) {
+            document.getElementById('listings-container').innerHTML =
+                `<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>${err.message}</h3></div>`;
         }
-    });
+    }
 
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dragArea.addEventListener(eventName, (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            dragArea.classList.add('dragover');
-        }, false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-        dragArea.addEventListener(eventName, (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            dragArea.classList.remove('dragover');
-        }, false);
-    });
-
-    dragArea.addEventListener('drop', (e) => {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        if (files && files[0]) {
-            handleImageFile(files[0]);
+    function renderListings(listings) {
+        const container = document.getElementById('listings-container');
+        if (!listings.length) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">🏡</div>
+                    <h3>No listings yet</h3>
+                    <p>Create your first property to start accepting bookings.</p>
+                    <button onclick="openCreateView()" class="btn btn-primary" style="margin-top:20px">+ Add Listing</button>
+                </div>`;
+            return;
         }
-    }, false);
 
-    removeBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        removeImage();
-    });
+        container.innerHTML = listings.map(l => {
+            const price  = l.price ? `₱${Number(l.price).toLocaleString()}` : '—';
+            const imgSrc = l.image || '/images/bedroom-balcony.jpg';
+            return `
+                <div class="host-listing-card">
+                    <!-- Left: Listing image with ribbon badge -->
+                    <div style="position: relative; flex-shrink: 0;">
+                        <img src="${imgSrc}" class="host-listing-img" onerror="this.src='/images/bedroom-balcony.jpg'">
+                        <span class="ribbon-badge">${l.type}</span>
+                    </div>
 
-    /* ─ Modal helpers ──────────────────────────────────────────────────────── */
-    function openCreateModal() {
+                    <!-- Right: Listing details and host operations -->
+                    <div class="host-listing-details">
+                        <div class="host-listing-row">
+                            <h2 style="font-family: var(--font-serif); font-size: 1.8rem; font-weight: 500;">${l.name}</h2>
+                            <span class="host-listing-price">${price}<small style="font-size:0.8rem; font-weight:400; color:var(--text-light-muted);">/night</small></span>
+                        </div>
+                        <p style="font-size:0.85rem; color:var(--text-light-muted); margin-bottom: 8px; font-style: italic;">📍 ${l.location}</p>
+                        <p style="font-size:0.85rem; color:var(--text-light-muted); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                            "${l.description}"
+                        </p>
+                        
+                        <div class="host-listing-actions">
+                            <a href="/host-bookings.html?listing=${l._id}" class="btn btn-primary btn-sm" style="background-color: var(--accent-teal);">📄 Requests</a>
+                            <button onclick='triggerEditView(${JSON.stringify(l).replace(/'/g,"&#39;")})' class="btn btn-secondary btn-sm">📝 Edit</button>
+                            <button onclick="deleteListing('${l._id}')" class="btn btn-danger btn-sm">🗑️ Delete</button>
+                        </div>
+                    </div>
+                </div>`;
+        }).join('');
+    }
+
+    /* ─ View Toggle Methods ────────────────────────────────────────────────── */
+    function showListingsView() {
+        document.getElementById('view-listings-list').style.display = 'block';
+        document.getElementById('view-listing-form-container').style.display = 'none';
+        loadListings();
+    }
+
+    function openCreateView() {
         editingId = null;
-        document.getElementById('modal-title').textContent  = 'Create New Listing';
-        document.getElementById('modal-submit').textContent = 'Create Listing';
-        document.getElementById('listing-form').reset();
         currentListingImage = '';
-        updateImagePreview('');
-        document.getElementById('modal-error').style.display = 'none';
-        document.getElementById('listing-modal').classList.add('open');
+        
+        document.getElementById('form-view-title').textContent = 'Create Listing';
+        
+        // Setup Create card background (greyish-brown) & postlisting button (teal)
+        const themeCard = document.getElementById('form-card-theme');
+        themeCard.className = 'form-card form-card-light';
+        
+        const submitBtn = document.getElementById('form-submit-btn');
+        submitBtn.className = 'btn btn-primary btn-full btn-lg';
+        
+        document.getElementById('listing-form').reset();
+        filenameInput.value = '';
+        document.getElementById('form-error').style.display = 'none';
+        
+        // Reset checkboxes
+        typeCheckboxes.forEach(cb => cb.checked = false);
+
+        document.getElementById('view-listings-list').style.display = 'none';
+        document.getElementById('view-listing-form-container').style.display = 'block';
     }
 
-    function openEditModal(listing) {
+    function triggerEditView(listing) {
         editingId = listing._id;
-        document.getElementById('modal-title').textContent  = 'Edit Listing';
-        document.getElementById('modal-submit').textContent = 'Save Changes';
-        document.getElementById('f-name').value        = listing.name;
-        document.getElementById('f-type').value        = listing.type;
-        document.getElementById('f-price').value       = listing.price;
-        document.getElementById('f-location').value    = listing.location;
-        document.getElementById('f-description').value = listing.description;
         currentListingImage = listing.image || '';
-        updateImagePreview(currentListingImage);
-        document.getElementById('f-contact').value     = listing.contactNumber;
-        document.getElementById('modal-error').style.display = 'none';
-        document.getElementById('listing-modal').classList.add('open');
-    }
+        
+        document.getElementById('form-view-title').textContent = 'Edit Listing';
 
-    function closeModal() {
-        document.getElementById('listing-modal').classList.remove('open');
-    }
+        // Setup Edit card background (dark-teal) & postlisting button (greyish-brown)
+        const themeCard = document.getElementById('form-card-theme');
+        themeCard.className = 'form-card form-card-dark';
+        
+        const submitBtn = document.getElementById('form-submit-btn');
+        submitBtn.className = 'btn btn-secondary btn-full btn-lg';
 
-    // Close on backdrop click
-    document.getElementById('listing-modal').addEventListener('click', e => {
-        if (e.target === document.getElementById('listing-modal')) closeModal();
-    });
+        document.getElementById('f-name').value = listing.name;
+        document.getElementById('f-location').value = listing.location;
+        document.getElementById('f-price').value = listing.price;
+        document.getElementById('f-description').value = listing.description;
+        document.getElementById('f-contact').value = listing.contactNumber;
+        filenameInput.value = listing.image ? 'Existing Image Saved' : '';
+        document.getElementById('form-error').style.display = 'none';
+
+        // Check correct type checkbox
+        typeCheckboxes.forEach(cb => {
+            cb.checked = (cb.value === listing.type);
+        });
+
+        document.getElementById('view-listings-list').style.display = 'none';
+        document.getElementById('view-listing-form-container').style.display = 'block';
+    }
 
     /* ─ Form submit (create or edit) ──────────────────────────────────────── */
     document.getElementById('listing-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const btn   = document.getElementById('modal-submit');
-        const errEl = document.getElementById('modal-error');
+        const btn   = document.getElementById('form-submit-btn');
+        const errEl = document.getElementById('form-error');
 
         errEl.style.display = 'none';
+        
+        const checkedTypecb = Array.from(typeCheckboxes).find(cb => cb.checked);
+        const selectedType = checkedTypecb ? checkedTypecb.value : "";
+
+        if (!selectedType) {
+            errEl.textContent   = "Please select a property type.";
+            errEl.style.display = 'block';
+            return;
+        }
+
         btn.disabled    = true;
         btn.textContent = 'Saving…';
 
         const data = {
             name:          document.getElementById('f-name').value.trim(),
-            type:          document.getElementById('f-type').value,
+            type:          selectedType,
             price:         parseFloat(document.getElementById('f-price').value),
             location:      document.getElementById('f-location').value.trim(),
             description:   document.getElementById('f-description').value.trim(),
-            image:         currentListingImage ||
-                           'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600',
+            image:         currentListingImage || '/images/bedroom-balcony.jpg',
             contactNumber: document.getElementById('f-contact').value.trim(),
         };
 
@@ -334,14 +318,13 @@
                 await api('POST', '/listings', data);
                 showToast('Listing created!', 'success');
             }
-            closeModal();
-            loadListings();
+            showListingsView();
         } catch (err) {
             errEl.textContent   = err.message;
             errEl.style.display = 'block';
         } finally {
             btn.disabled    = false;
-            btn.textContent = editingId ? 'Save Changes' : 'Create Listing';
+            btn.textContent = 'POSTLISTING';
         }
     });
 

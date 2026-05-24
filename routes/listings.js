@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
             sort === 'price_asc'  ? { price:  1 } :
             sort === 'price_desc' ? { price: -1 } : {};
 
-        const listings = await Listing.find(query).sort(sortOption);
+        const listings = await Listing.find(query).sort(sortOption).populate('hostId', 'name');
         res.status(200).json(listings);
     } catch (err) {
         res.status(500).json({ message: 'Error fetching listings.', error: err.message });

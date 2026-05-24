@@ -15,7 +15,7 @@ function requireAuth(roles) {
     const user = getUser();
     if (!user) { window.location.href = '/index.html'; return null; }
     if (roles && !roles.includes(user.role)) {
-        const home = user.role === 'Guest'  ? '/listings.html'     :
+        const home = user.role === 'Guest'  ? '/index.html'        :
                      user.role === 'Host'   ? '/host-listings.html' :
                                               '/admin-listings.html';
         window.location.href = home;
@@ -67,31 +67,31 @@ function renderNav(activePage) {
 
     const roleLinks = {
         Guest: [
-            { href: '/listings.html',     label: '🏠 Browse' },
-            { href: '/my-bookings.html',  label: '📅 My Bookings' },
+            { href: '/index.html',        label: 'Home' },
+            { href: '/listings.html',     label: 'Browse' },
+            { href: '/my-bookings.html',  label: 'My Bookings' },
         ],
         Host: [
-            { href: '/listings.html',       label: '🏠 Browse' },
-            { href: '/host-listings.html',  label: '🏡 My Listings' },
-            { href: '/host-bookings.html',  label: '📋 Requests' },
+            { href: '/host-listings.html',  label: 'My Listings' },
+            { href: '/host-bookings.html',  label: 'Requests' },
         ],
         Admin: [
-            { href: '/listings.html',       label: '🏠 Browse' },
-            { href: '/admin-listings.html', label: '⚙️ Listings' },
-            { href: '/admin-bookings.html', label: '📊 Bookings' },
+            { href: '/admin-listings.html', label: 'Listings' },
+            { href: '/admin-bookings.html', label: 'Bookings' },
+            { href: '/admin-users.html',    label: 'Users' },
         ],
     };
 
     const links = user ? (roleLinks[user.role] || []) : [];
     const homeHref = !user ? '/index.html' :
-                     user.role === 'Guest'  ? '/listings.html' :
+                     user.role === 'Guest'  ? '/index.html' :
                      user.role === 'Host'   ? '/host-listings.html' :
-                                             '/admin-listings.html';
+                                              '/admin-listings.html';
 
     nav.innerHTML = `
         <div class="nav-inner">
             <a href="${homeHref}" class="nav-brand">
-                <span class="nav-logo">🏠</span> StayEZ
+                <div class="nav-logo-circle">🗺️</div> StayEZ
             </a>
             <div class="nav-links" id="nav-links-inner">
                 ${links.map(l => `
@@ -100,10 +100,9 @@ function renderNav(activePage) {
                 ${user ? `
                     <div class="nav-user">
                         <div class="nav-avatar">${user.name[0].toUpperCase()}</div>
-                        <span class="nav-username">${user.name.split(' ')[0]}</span>
-                        <span class="nav-role role-${user.role.toLowerCase()}">${user.role}</span>
+                        <span class="nav-username" style="color: var(--text-primary); font-weight: 700;">${user.name.split(' ')[0]}</span>
                     </div>
-                    <button onclick="logout()" class="btn btn-outline btn-sm">Logout</button>
+                    <button onclick="logout()" class="btn btn-primary btn-sm" style="border-radius: 20px;">Log Out</button>
                 ` : `
                     <a href="/index.html"    class="btn btn-outline btn-sm">Login</a>
                     <a href="/register.html" class="btn btn-primary btn-sm">Sign Up</a>
@@ -115,26 +114,24 @@ function renderNav(activePage) {
 }
 
 /* ─── Listing Card Builder ───────────────────────────────────────────────────── */
-function listingCard(listing, showBookBtn = false) {
+function listingCard(listing) {
     const price = listing.price ? `₱${Number(listing.price).toLocaleString()}` : '—';
-    const img   = listing.image || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=500';
+    const img   = listing.image || '/images/bedroom-balcony.jpg';
     return `
         <div class="listing-card">
             <div class="listing-img-wrap">
                 <img src="${img}" alt="${listing.name}"
-                     onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=500'"
+                     onerror="this.src='/images/bedroom-balcony.jpg'"
                      loading="lazy">
-                <span class="listing-type-badge">${listing.type}</span>
+                <span class="ribbon-badge">${listing.type}</span>
             </div>
             <div class="listing-info">
                 <h3 class="listing-name">${listing.name}</h3>
                 <p class="listing-location">📍 ${listing.location}</p>
-                <p class="listing-desc">${listing.description}</p>
+                <p class="listing-desc">${listing.description || ''}</p>
                 <div class="listing-footer">
-                    <span class="listing-price">${price}<small>/night</small></span>
-                    <div class="listing-actions">
-                        ${showBookBtn ? `<a href="/book.html?id=${listing._id}" class="btn btn-primary btn-sm">Book Now</a>` : ''}
-                    </div>
+                    <span class="listing-price">${price}<span class="listing-price-label">/night</span></span>
+                    <a href="/listing-details.html?id=${listing._id}" class="btn-view-details">View Details</a>
                 </div>
             </div>
         </div>
@@ -146,5 +143,5 @@ function formatDate(d) {
     return new Date(d).toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 function statusBadge(status) {
-    return `<span class="status-badge status-${status}">${status}</span>`;
+    return `<span class="status-pill ${status.toLowerCase()}">${status}</span>`;
 }

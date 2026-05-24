@@ -21,7 +21,7 @@
     const user = requireAuth(['Guest']);
 
     if (user) {
-        renderNav('/book.html');
+        renderNav('/listings.html');
 
         const params    = new URLSearchParams(window.location.search);
         const listingId = params.get('id');
@@ -51,90 +51,79 @@
     function renderBookingForm(listing) {
         const today    = new Date().toISOString().split('T')[0];
         const price    = listing.price ? `₱${Number(listing.price).toLocaleString()}` : 'N/A';
-        const imgSrc   = listing.image || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600';
+        const imgSrc   = listing.image || '/images/bedroom-balcony.jpg';
 
         document.getElementById('book-content').innerHTML = `
-            <div style="margin-bottom:24px;">
-                <a href="/listings.html" style="color:var(--text-secondary);font-size:0.875rem;text-decoration:none;">
-                    ← Back to Listings
-                </a>
-                <h1 class="page-title" style="margin-top:10px;">Book a <span>Stay</span></h1>
+            <!-- Back Arrow -->
+            <button class="back-btn-circle" onclick="window.history.back()">⬅</button>
+            
+            <div style="margin-bottom: 32px;">
+                <h1 class="page-title">Booking</h1>
+                <p style="color:var(--text-secondary); margin-top:4px;">Enter your details to reserve your stay and experiences</p>
             </div>
 
-            <div class="book-grid">
-                <!-- ─ Listing Preview ─ -->
-                <div class="card" style="padding:0; overflow:hidden;">
+            <div class="book-layout">
+                <!-- Left: Listing Preview Info (Mockup 8 Layout) -->
+                <div>
                     <img src="${imgSrc}"
-                         onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600'"
+                         onerror="this.src='/images/bedroom-balcony.jpg'"
                          alt="${listing.name}"
-                         style="width:100%; height:240px; object-fit:cover;">
-                    <div style="padding:24px;">
-                        <span class="listing-type-badge inline" style="margin-bottom:12px;">${listing.type}</span>
-                        <h2 style="font-size:1.3rem; font-weight:700; margin-bottom:6px;">${listing.name}</h2>
-                        <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:12px;">📍 ${listing.location}</p>
-                        <p style="color:var(--text-muted); font-size:0.875rem; line-height:1.6; margin-bottom:20px;">${listing.description}</p>
-                        <div style="display:flex; align-items:baseline; gap:8px; padding-top:16px; border-top:1px solid var(--border-glass);">
-                            <span style="font-size:1.5rem; font-weight:800; color:var(--accent-2);">${price}</span>
-                            <span style="color:var(--text-secondary); font-size:0.875rem;">/ night</span>
+                         style="width:100%; height:320px; object-fit:cover; border-radius:var(--radius-lg); box-shadow: var(--shadow-soft);">
+                    <div style="padding: 24px 0 0;">
+                        <h2 style="font-family: var(--font-serif); font-size:2.2rem; font-weight:500; margin-bottom:6px;">${listing.name}</h2>
+                        <p style="color:var(--text-secondary); font-size:1.05rem; margin-bottom:4px;">${listing.type}</p>
+                        <p style="color:var(--text-secondary); font-size:1.05rem; font-style: italic; margin-bottom:20px;">📍 ${listing.location}</p>
+                        <div style="padding-top:16px; border-top:1px solid var(--border-light);">
+                            <span style="font-size:1.4rem; font-weight:800; color:var(--accent-teal); text-transform: uppercase; letter-spacing: 0.5px;">
+                                ${price} / night
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                <!-- ─ Booking Form ─ -->
-                <div class="form-card">
-                    <h3 style="font-size:1.1rem; font-weight:700; margin-bottom:24px;">📅 Select Your Dates</h3>
+                <!-- Right: Dates Selection Card (Mockup 8 Grey Background) -->
+                <div class="book-card-container">
+                    <h3 style="font-family: var(--font-serif); font-size:1.8rem; font-weight:500; margin-bottom:28px;">Select your dates</h3>
                     <form id="book-form">
                         <div class="form-group">
-                            <label class="form-label" for="start-date">Check-in Date</label>
+                            <label class="form-label" for="start-date">START-DATE</label>
                             <input type="date" id="start-date" class="form-input" min="${today}" required>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label" for="end-date">Check-out Date</label>
+                        <div class="form-group" style="margin-bottom: 30px;">
+                            <label class="form-label" for="end-date">END-DATE</label>
                             <input type="date" id="end-date" class="form-input" min="${today}" required>
                         </div>
 
-                        <!-- Price summary (shown after dates selected) -->
-                        <div id="price-summary" class="price-summary" style="display:none;">
-                            <div class="price-row">
-                                <span id="nights-label">0 nights</span>
-                                <span>${price} / night</span>
-                            </div>
-                            <div class="price-total">
-                                <span>Estimated Total</span>
-                                <span id="total-price" style="color:var(--accent-2);">₱0</span>
-                            </div>
+                        <!-- Price calculation -->
+                        <div style="margin-bottom: 30px;">
+                            <h4 id="price-total-display" style="font-size: 1.35rem; font-weight: 700; color: var(--text-primary);">
+                                TOTAL: Php 0.00
+                            </h4>
                         </div>
 
                         <div id="book-error" class="error-box"></div>
 
-                        <button type="submit" id="book-btn" class="btn btn-primary btn-full btn-lg">
-                            Confirm Booking
+                        <button type="submit" id="book-btn" class="btn btn-primary btn-full btn-lg" style="border-radius: 30px; letter-spacing: 0.5px;">
+                            CONFIRM BOOKING
                         </button>
-                        <p style="text-align:center; color:var(--text-muted); font-size:0.78rem; margin-top:12px;">
-                            Booking is submitted as <strong>Pending</strong> — the host must approve it.
-                        </p>
                     </form>
                 </div>
             </div>
         `;
 
-        // ─ Price Calculator ─────────────────────────────────────────────────
         const pricePerNight = listing.price || 0;
 
         function recalc() {
             const s = document.getElementById('start-date').value;
             const e = document.getElementById('end-date').value;
-            const summary = document.getElementById('price-summary');
+            const totalDisplay = document.getElementById('price-total-display');
             if (s && e) {
                 const nights = Math.round((new Date(e) - new Date(s)) / 86400000);
                 if (nights > 0) {
-                    document.getElementById('nights-label').textContent = `${nights} night${nights !== 1 ? 's' : ''}`;
-                    document.getElementById('total-price').textContent  = `₱${(pricePerNight * nights).toLocaleString()}`;
-                    summary.style.display = 'block';
+                    totalDisplay.textContent = `TOTAL: Php ${(pricePerNight * nights).toLocaleString()}`;
                 } else {
-                    summary.style.display = 'none';
+                    totalDisplay.textContent = `TOTAL: Php 0.00`;
                 }
-                // Ensure end-date min tracks start-date
                 document.getElementById('end-date').min = s;
             }
         }
@@ -142,7 +131,6 @@
         document.getElementById('start-date').addEventListener('change', recalc);
         document.getElementById('end-date').addEventListener('change',   recalc);
 
-        // ─ Submit ────────────────────────────────────────────────────────────
         document.getElementById('book-form').addEventListener('submit', async (ev) => {
             ev.preventDefault();
             const btn   = document.getElementById('book-btn');
@@ -164,7 +152,7 @@
                 errEl.textContent   = err.message;
                 errEl.style.display = 'block';
                 btn.disabled        = false;
-                btn.textContent     = 'Confirm Booking';
+                btn.textContent     = 'CONFIRM BOOKING';
             }
         });
     }

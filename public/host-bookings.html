@@ -11,22 +11,29 @@
 <nav id="main-nav"></nav>
 
 <div class="page-container">
-    <div class="page-header">
-        <div>
-            <h1 class="page-title">Booking <span>Requests</span></h1>
-            <p style="color:var(--text-secondary); margin-top:4px;">Approve or reject guest bookings for your properties</p>
-        </div>
-        <a href="/host-listings.html" class="btn btn-outline">← My Listings</a>
+    <div style="margin-bottom: 32px;">
+        <h1 class="page-title">Booking Requests</h1>
+        <p style="color:var(--text-secondary); margin-top:4px;">Approve or reject guest bookings for your properties</p>
     </div>
 
-    <!-- Listing Selector -->
-    <div class="filter-bar">
-        <label style="color:var(--text-secondary); font-size:0.875rem; white-space:nowrap; font-weight:600;">
-            Viewing requests for:
-        </label>
-        <select id="listing-select" class="form-select" style="flex:1; max-width:400px;">
-            <option value="">— Select a listing —</option>
-        </select>
+    <!-- Redesigned Listing Selector & Stats Row (Mockup 15) -->
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 36px;">
+        <div style="display: flex; align-items: center; gap: 12px; flex-grow: 1;">
+            <label style="color:var(--text-primary); font-size:1.05rem; font-family: var(--font-serif); font-weight:500; white-space:nowrap;">
+                Viewing requests for:
+            </label>
+            <select id="listing-select" class="form-select" style="max-width: 320px; border-radius: 20px; background-color: var(--bg-secondary); border: 1px solid var(--text-primary); font-family: var(--font-sans); font-weight: 600;">
+                <option value="">-- Select Listing --</option>
+            </select>
+        </div>
+
+        <!-- Dynamic Stat badges (Mockup 15) -->
+        <div class="requests-stats-bar" id="requests-stats">
+            <span class="requests-stat-pill total">0 Total</span>
+            <span class="requests-stat-pill approved">0 Approved</span>
+            <span class="requests-stat-pill pending">0 Pending</span>
+            <span class="requests-stat-pill rejected">0 Rejected</span>
+        </div>
     </div>
 
     <div id="bookings-container">
@@ -41,6 +48,8 @@
 <script>
     const user = requireAuth(['Host']);
     if (user) { renderNav('/host-bookings.html'); init(); }
+
+    let currentListing = null;
 
     async function init() {
         try {
@@ -64,20 +73,40 @@
                 select.appendChild(opt);
             });
 
-            // Auto-select from URL param
             const urlParams  = new URLSearchParams(window.location.search);
             const preselect  = urlParams.get('listing');
             if (preselect) {
                 select.value = preselect;
+                currentListing = listings.find(l => l._id === preselect);
                 loadBookings(preselect);
             }
 
             select.addEventListener('change', () => {
-                if (select.value) loadBookings(select.value);
+                if (select.value) {
+                    currentListing = listings.find(l => l._id === select.value);
+                    loadBookings(select.value);
+                } else {
+                    currentListing = null;
+                    resetStats();
+                    document.getElementById('bookings-container').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📋</div>
+                            <h3>Select a listing above to view its booking requests</h3>
+                        </div>`;
+                }
             });
         } catch (err) {
             showToast(err.message, 'error');
         }
+    }
+
+    function resetStats() {
+        document.getElementById('requests-stats').innerHTML = `
+            <span class="requests-stat-pill total">0 Total</span>
+            <span class="requests-stat-pill approved">0 Approved</span>
+            <span class="requests-stat-pill pending">0 Pending</span>
+            <span class="requests-stat-pill rejected">0 Rejected</span>
+        `;
     }
 
     async function loadBookings(listingId) {
@@ -85,15 +114,28 @@
             '<div class="loading"><div class="spinner"></div><span>Loading requests…</span></div>';
         try {
             const bookings = await api('GET', '/bookings/listing/' + listingId);
-            renderBookings(bookings);
+            renderStatsAndBookings(bookings);
         } catch (err) {
             document.getElementById('bookings-container').innerHTML =
                 `<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>${err.message}</h3></div>`;
         }
     }
 
-    function renderBookings(bookings) {
+    function renderStatsAndBookings(bookings) {
         const container = document.getElementById('bookings-container');
+        
+        const pending  = bookings.filter(b => b.status === 'pending').length;
+        const approved = bookings.filter(b => b.status === 'approved').length;
+        const rejected = bookings.filter(b => b.status === 'rejected').length;
+
+        // Render Stats Bar
+        document.getElementById('requests-stats').innerHTML = `
+            <span class="requests-stat-pill total">${bookings.length} Total</span>
+            <span class="requests-stat-pill approved">${approved} Approved</span>
+            <span class="requests-stat-pill pending">${pending} Pending</span>
+            <span class="requests-stat-pill rejected">${rejected} Rejected</span>
+        `;
+
         if (!bookings.length) {
             container.innerHTML = `
                 <div class="empty-state">
@@ -104,67 +146,73 @@
             return;
         }
 
-        // Stats mini-bar
-        const pending  = bookings.filter(b => b.status === 'pending').length;
-        const approved = bookings.filter(b => b.status === 'approved').length;
-        const rejected = bookings.filter(b => b.status === 'rejected').length;
+        // Render Request Cards (Mockup 15)
+        const listingImgSrc = currentListing && currentListing.image ? currentListing.image : '/images/bedroom-balcony.jpg';
+        const listingType = currentListing ? currentListing.type : 'Type';
 
-        container.innerHTML = `
-            <div style="display:flex; gap:12px; margin-bottom:20px; flex-wrap:wrap;">
-                <div style="padding:10px 18px; background:var(--bg-glass); border:1px solid var(--border-glass); border-radius:var(--radius-sm); font-size:0.875rem;">
-                    <span style="font-weight:700;">${bookings.length}</span> <span style="color:var(--text-secondary);">Total</span>
-                </div>
-                <div style="padding:10px 18px; background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.25); border-radius:var(--radius-sm); font-size:0.875rem;">
-                    <span style="font-weight:700; color:var(--warning);">${pending}</span> <span style="color:var(--text-secondary);">Pending</span>
-                </div>
-                <div style="padding:10px 18px; background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.25); border-radius:var(--radius-sm); font-size:0.875rem;">
-                    <span style="font-weight:700; color:var(--success);">${approved}</span> <span style="color:var(--text-secondary);">Approved</span>
-                </div>
-                <div style="padding:10px 18px; background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.25); border-radius:var(--radius-sm); font-size:0.875rem;">
-                    <span style="font-weight:700; color:var(--danger);">${rejected}</span> <span style="color:var(--text-secondary);">Rejected</span>
-                </div>
-            </div>
+        container.innerHTML = bookings.map(b => {
+            const guestName = b.guestId ? b.guestId.name : 'N/A';
+            const guestEmail = b.guestId ? b.guestId.email : '—';
+            const isPending = b.status === 'pending';
+            const isApproved = b.status === 'approved';
 
-            <div class="table-wrap">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Guest</th>
-                            <th>Email</th>
-                            <th>Check-in</th>
-                            <th>Check-out</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${bookings.map(b => `
-                            <tr id="row-${b._id}">
-                                <td><strong>${b.guestId ? b.guestId.name : 'N/A'}</strong></td>
-                                <td style="color:var(--text-secondary);">${b.guestId ? b.guestId.email : '—'}</td>
-                                <td>${formatDate(b.startDate)}</td>
-                                <td>${formatDate(b.endDate)}</td>
-                                <td>${statusBadge(b.status)}</td>
-                                <td>
-                                    ${b.status === 'pending'
-                                        ? `<div style="display:flex; gap:6px;">
-                                               <button onclick="updateStatus('${b._id}', 'approved')"
-                                                       class="btn btn-success btn-sm" id="approve-${b._id}">✓ Approve</button>
-                                               <button onclick="updateStatus('${b._id}', 'rejected')"
-                                                       class="btn btn-danger btn-sm"  id="reject-${b._id}">✕ Reject</button>
-                                           </div>`
-                                        : `<span style="color:var(--text-muted); font-size:0.8rem;">—</span>`
-                                    }
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </div>`;
+            let actionButtonsHtml = '';
+            if (isPending) {
+                actionButtonsHtml = `
+                    <button onclick="updateStatus('${b._id}', 'approved')" class="btn btn-success btn-sm" id="approve-${b._id}">✓ Approve</button>
+                    <button onclick="updateStatus('${b._id}', 'rejected')" class="btn btn-danger btn-sm" id="reject-${b._id}">✕ Reject</button>
+                `;
+            } else if (isApproved) {
+                actionButtonsHtml = `
+                    <button class="btn btn-success btn-sm" disabled style="opacity: 0.9;">✓ Approve</button>
+                    <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.4;">✕ Reject</button>
+                `;
+            } else {
+                actionButtonsHtml = `
+                    <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.4;">✓ Approve</button>
+                    <button class="btn btn-danger btn-sm" disabled style="opacity: 0.9;">✕ Reject</button>
+                `;
+            }
+
+            return `
+                <div class="request-card" id="card-${b._id}">
+                    <div class="request-card-content">
+                        <!-- Left Image with type ribbon badge -->
+                        <div class="booking-img-container">
+                            <img src="${listingImgSrc}" onerror="this.src='/images/bedroom-balcony.jpg'">
+                            <span class="ribbon-badge">${listingType}</span>
+                        </div>
+
+                        <!-- Right details -->
+                        <div class="request-card-info">
+                            <div class="request-title-row">
+                                <h3 style="font-family: var(--font-serif); font-size: 1.6rem; font-weight: 500;">
+                                    ${currentListing ? currentListing.name : 'Listing'}
+                                </h3>
+                                ${statusBadge(b.status)}
+                            </div>
+                            
+                            <p style="font-size:0.9rem; color:var(--text-light-muted); margin-bottom: 2px;">
+                                📍 ${currentListing ? currentListing.location : 'Location'} | 📅 ${formatDate(b.startDate)} - ${formatDate(b.endDate)}
+                            </p>
+                            
+                            <!-- Guest Name and Email row -->
+                            <div class="request-guest-name">
+                                <span style="font-size: 1.1rem;">👤</span> 
+                                <span style="font-weight: 700; color: var(--text-light);">${guestName}</span>
+                                <span style="margin-left: 6px; font-size: 0.85rem; color: var(--text-light-muted);">(${guestEmail})</span>
+                            </div>
+
+                            <div class="request-actions">
+                                ${actionButtonsHtml}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+        }).join('');
     }
 
     async function updateStatus(bookingId, status) {
-        // Disable buttons for this row immediately
         const approveBtn = document.getElementById('approve-' + bookingId);
         const rejectBtn  = document.getElementById('reject-'  + bookingId);
         if (approveBtn) approveBtn.disabled = true;
@@ -176,9 +224,7 @@
                 status === 'approved' ? '✓ Booking approved!' : '✕ Booking rejected.',
                 status === 'approved' ? 'success' : 'info'
             );
-            // Reload the current listing's bookings
-            const listingId = document.getElementById('listing-select').value;
-            loadBookings(listingId);
+            loadBookings(document.getElementById('listing-select').value);
         } catch (err) {
             showToast(err.message, 'error');
             if (approveBtn) approveBtn.disabled = false;

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StayEZ — All Users (Admin)</title>
+    <meta name="description" content="Administrator view of all users on StayEZ. Track roles and register dates.">
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav id="main-nav"></nav>
+
+<div class="page-container">
+    <div style="margin-align: center; text-align: center; margin-bottom: 40px;">
+        <h1 class="page-title" style="font-size: 2.6rem;">All Users</h1>
+        <p style="color:var(--text-secondary); margin-top:6px; font-size: 1.05rem;">Manage Users of the whole system</p>
+    </div>
+
+    <!-- Redesigned Search & Filter Header (Mockup 17) -->
+    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+        <div class="search-pill-container" style="margin: 0; max-width: 320px; flex-grow: 1;">
+            <input type="text" id="search" class="search-pill-input" placeholder="Search Users..." style="padding: 12px 40px 12px 20px; font-size: 0.95rem;">
+            <span class="search-pill-icon">🔍</span>
+        </div>
+        <button id="role-filter-toggle" class="btn btn-filter" style="font-size: 0.95rem; padding: 10px 24px; min-width: auto; border-radius: 20px;">Role <span>∨</span></button>
+    </div>
+
+    <!-- Role Filter Dropdown Card -->
+    <div id="role-card" class="sort-dropdown-card" style="margin: -14px 0 24px auto; width: 160px;">
+        <button class="sort-btn-option" data-value="">All Roles</button>
+        <button class="sort-btn-option" data-value="Guest">Guest</button>
+        <button class="sort-btn-option" data-value="Host">Host</button>
+        <button class="sort-btn-option" data-value="Admin">Admin</button>
+    </div>
+
+    <div id="users-container">
+        <div class="loading"><div class="spinner"></div><span>Loading all users…</span></div>
+    </div>
+</div>
+
+<script src="/app.js"></script>
+<script>
+    const user = requireAuth(['Admin']);
+    let allUsers = [];
+    let selectedRole = "";
+
+    if (user) { renderNav('/admin-users.html'); loadUsers(); }
+
+    // Toggle Role Dropdown
+    const roleToggle = document.getElementById('role-filter-toggle');
+    const roleCard = document.getElementById('role-card');
+
+    roleToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        roleCard.classList.toggle('open');
+        roleToggle.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!roleCard.contains(e.target) && e.target !== roleToggle) {
+            roleCard.classList.remove('open');
+            roleToggle.classList.remove('active');
+        }
+    });
+
+    async function loadUsers() {
+        document.getElementById('users-container').innerHTML =
+            '<div class="loading"><div class="spinner"></div><span>Loading…</span></div>';
+        try {
+            allUsers = await api('GET', '/auth/users');
+            filterAndRenderUsers();
+        } catch (err) {
+            document.getElementById('users-container').innerHTML =
+                `<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>${err.message}</h3></div>`;
+        }
+    }
+
+    function filterAndRenderUsers() {
+        const searchVal = document.getElementById('search').value.toLowerCase().trim();
+        
+        let filtered = allUsers;
+
+        if (selectedRole) {
+            filtered = filtered.filter(u => u.role === selectedRole);
+        }
+
+        if (searchVal) {
+            filtered = filtered.filter(u => {
+                const name = u.name.toLowerCase();
+                const email = u.email.toLowerCase();
+                return name.includes(searchVal) || email.includes(searchVal);
+            });
+        }
+
+        renderUsers(filtered);
+    }
+
+    function renderUsers(users) {
+        const container = document.getElementById('users-container');
+        if (!users.length) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">👥</div>
+                    <h3>No users found</h3>
+                    <p>Try adjusting your search or role filters.</p>
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="table-wrap">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Date Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${users.map(u => `
+                            <tr>
+                                <td><strong>${u.name}</strong></td>
+                                <td style="color:var(--text-secondary);">${u.email}</td>
+                                <td><span style="font-weight: 600;">${u.role}</span></td>
+                                <td style="color:var(--text-secondary);">${formatDate(u.createdAt)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>`;
+    }
+
+    // Event wiring
+    document.getElementById('search').addEventListener('input', filterAndRenderUsers);
+
+    const roleOptions = document.querySelectorAll('#role-card .sort-btn-option');
+    roleOptions.forEach(opt => {
+        opt.addEventListener('click', () => {
+            roleOptions.forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+            selectedRole = opt.getAttribute('data-value');
+            
+            roleCard.classList.remove('open');
+            roleToggle.classList.remove('active');
+            
+            // Update Toggle Button Text
+            roleToggle.innerHTML = `${opt.textContent} <span>∨</span>`;
+            
+            filterAndRenderUsers();
+        });
+    });
+</script>
+</body>
+</html>

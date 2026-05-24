@@ -3,73 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StayEZ — Login</title>
-    <meta name="description" content="Login to StayEZ, your mini Airbnb platform for finding and booking the perfect stay.">
+    <title>StayEZ — Home</title>
+    <meta name="description" content="Welcome to StayEZ, your premium mini Airbnb platform for finding and booking the perfect stay.">
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
-<div class="auth-page">
-    <div class="auth-card">
-        <div class="auth-logo">
-            <h1>🏠 StayEZ</h1>
-            <p>Your home away from home</p>
-        </div>
+<nav id="main-nav" style="display: none;"></nav>
 
-        <form id="login-form">
-            <div class="form-group">
-                <label class="form-label" for="email">Email Address</label>
-                <input type="email" id="email" class="form-input" placeholder="you@example.com" required autocomplete="email">
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="password">Password</label>
-                <input type="password" id="password" class="form-input" placeholder="••••••••" required autocomplete="current-password">
-            </div>
-            <div id="login-error" class="error-box"></div>
-            <button type="submit" id="login-btn" class="btn btn-primary btn-full btn-lg">Sign In</button>
-        </form>
-
-        <div class="auth-switch">
-            Don't have an account? <a href="/register.html">Create one</a>
-        </div>
-    </div>
+<div id="main-content">
+    <div class="loading"><div class="spinner"></div><span>Loading StayEZ…</span></div>
 </div>
 
 <script src="/app.js"></script>
 <script>
-    // Redirect if already logged in
     const existing = getUser();
     if (existing) {
-        window.location.href =
-            existing.role === 'Guest' ? '/listings.html' :
-            existing.role === 'Host'  ? '/host-listings.html' : '/admin-listings.html';
-    }
-
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn   = document.getElementById('login-btn');
-        const errEl = document.getElementById('login-error');
-
-        errEl.style.display = 'none';
-        btn.disabled    = true;
-        btn.textContent = 'Signing in…';
-
-        try {
-            const user = await api('POST', '/auth/login', {
-                email:    document.getElementById('email').value.trim(),
-                password: document.getElementById('password').value,
-            });
-            saveUser(user);
-            window.location.href =
-                user.role === 'Guest' ? '/listings.html' :
-                user.role === 'Host'  ? '/host-listings.html' : '/admin-listings.html';
-        } catch (err) {
-            errEl.textContent    = err.message;
-            errEl.style.display  = 'block';
-            btn.disabled         = false;
-            btn.textContent      = 'Sign In';
+        if (existing.role === 'Host') {
+            window.location.href = '/host-listings.html';
+        } else if (existing.role === 'Admin') {
+            window.location.href = '/admin-listings.html';
+        } else if (existing.role === 'Guest') {
+            // Render guest home hero layout (Mockup 5)
+            document.getElementById('main-nav').style.display = 'block';
+            renderNav('/index.html');
+            
+            document.getElementById('main-content').innerHTML = `
+                <div class="hero-container">
+                    <h1 class="hero-title">Take it easy<br><span>StayEZ</span></h1>
+                    <a href="/listings.html" class="btn btn-hero-browse">BROWSE</a>
+                </div>
+            `;
         }
-    });
+    } else {
+        // Render welcome login card view (Mockup 1)
+        document.body.classList.add('welcome-page');
+        document.getElementById('main-content').innerHTML = `
+            <div class="welcome-card">
+                <h2 class="welcome-title">Welcome</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email</label>
+                        <input type="email" id="email" class="form-input" placeholder="you@example.com" required autocomplete="email">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 30px;">
+                        <label class="form-label" for="password">Password</label>
+                        <input type="password" id="password" class="form-input" placeholder="••••••••" required autocomplete="current-password">
+                    </div>
+                    <div id="login-error" class="error-box"></div>
+                    <div class="welcome-buttons-row">
+                        <button type="submit" id="login-btn" class="welcome-btn">Sign In</button>
+                        <a href="/register.html" class="welcome-btn" style="display: flex; align-items: center; justify-content: center;">Sign Up</a>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn   = document.getElementById('login-btn');
+            const errEl = document.getElementById('login-error');
+
+            errEl.style.display = 'none';
+            btn.disabled    = true;
+            btn.textContent = 'Signing in…';
+
+            try {
+                const user = await api('POST', '/auth/login', {
+                    email:    document.getElementById('email').value.trim(),
+                    password: document.getElementById('password').value,
+                });
+                saveUser(user);
+                if (user.role === 'Guest') {
+                    window.location.href = '/index.html'; // Reload to show home hero view
+                } else if (user.role === 'Host') {
+                    window.location.href = '/host-listings.html';
+                } else {
+                    window.location.href = '/admin-listings.html';
+                }
+            } catch (err) {
+                errEl.textContent    = err.message;
+                errEl.style.display  = 'block';
+                btn.disabled         = false;
+                btn.textContent      = 'Sign In';
+            }
+        });
+    }
 </script>
 </body>
 </html>

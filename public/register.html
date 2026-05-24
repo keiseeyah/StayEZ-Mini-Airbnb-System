@@ -7,44 +7,41 @@
     <meta name="description" content="Create your StayEZ account to start booking or listing properties.">
     <link rel="stylesheet" href="/style.css">
 </head>
-<body>
+<body class="welcome-page">
 
-<div class="auth-page">
-    <div class="auth-card">
-        <div class="auth-logo">
-            <h1>🏠 StayEZ</h1>
-            <p>Create your account</p>
+<div class="welcome-card">
+    <h2 class="welcome-title">Create Account</h2>
+
+    <form id="register-form">
+        <div class="form-group">
+            <label class="form-label" for="name">Full Name</label>
+            <input type="text" id="name" class="form-input" placeholder="Juan dela Cruz" required autocomplete="name">
         </div>
-
-        <form id="register-form">
-            <div class="form-group">
-                <label class="form-label" for="name">Full Name</label>
-                <input type="text" id="name" class="form-input" placeholder="Juan dela Cruz" required autocomplete="name">
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="email">Email Address</label>
-                <input type="email" id="email" class="form-input" placeholder="you@example.com" required autocomplete="email">
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="password">Password</label>
-                <input type="password" id="password" class="form-input" placeholder="Min. 6 characters" required minlength="6" autocomplete="new-password">
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="role">I want to…</label>
-                <select id="role" class="form-select" required>
-                    <option value="" disabled selected>Select your role</option>
-                    <option value="Guest">🛏 Book a stay (Guest)</option>
-                    <option value="Host">🏡 List my property (Host)</option>
-                    <option value="Admin">⚙️ Manage the platform (Admin)</option>
-                </select>
-            </div>
-            <div id="reg-error" class="error-box"></div>
-            <button type="submit" id="reg-btn" class="btn btn-primary btn-full btn-lg">Create Account</button>
-        </form>
-
-        <div class="auth-switch">
-            Already have an account? <a href="/index.html">Sign in</a>
+        <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <input type="email" id="email" class="form-input" placeholder="you@example.com" required autocomplete="email">
         </div>
+        <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input type="password" id="password" class="form-input" placeholder="Min. 6 characters" required minlength="6" autocomplete="new-password">
+        </div>
+        <div class="form-group" style="margin-bottom: 30px;">
+            <label class="form-label" for="role">I want to…</label>
+            <select id="role" class="form-select" style="border-radius: 40px; background-color: var(--bg-light); color: var(--text-primary); border: none; padding: 16px 24px; font-size: 1.05rem;" required>
+                <option value="" disabled selected>Select your role</option>
+                <option value="Guest">🛏 Book a stay (Guest)</option>
+                <option value="Host">🏡 List my property (Host)</option>
+                <option value="Admin">⚙️ Manage the platform (Admin)</option>
+            </select>
+        </div>
+        <div id="reg-error" class="error-box"></div>
+        <div class="welcome-buttons-row">
+            <button type="submit" id="reg-btn" class="welcome-btn" style="grid-column: 1 / span 2; width: 100%;">Create Account</button>
+        </div>
+    </form>
+
+    <div style="text-align: center; margin-top: 24px; font-size: 0.9rem; color: var(--text-light-muted);">
+        Already have an account? <a href="/index.html" style="color: var(--text-light); font-weight: 700; text-decoration: underline;">Sign in</a>
     </div>
 </div>
 

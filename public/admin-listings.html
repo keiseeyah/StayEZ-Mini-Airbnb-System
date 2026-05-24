@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StayEZ — Manage Listings (Admin)</title>
+    <title>StayEZ — All Listings (Admin)</title>
     <meta name="description" content="Administrator view of all listings on StayEZ. Search, filter, and delete any listing.">
     <link rel="stylesheet" href="/style.css">
 </head>
@@ -11,33 +11,36 @@
 <nav id="main-nav"></nav>
 
 <div class="page-container">
-    <div class="page-header">
-        <div>
-            <h1 class="page-title">Manage <span>Listings</span></h1>
-            <p style="color:var(--text-secondary); margin-top:4px;">Administrator — view and delete any listing</p>
+    <div style="margin-align: center; text-align: center; margin-bottom: 40px;">
+        <h1 class="page-title" style="font-size: 2.6rem;">All Listings</h1>
+        <p style="color:var(--text-secondary); margin-top:6px; font-size: 1.05rem;">Manage Listings of the whole system</p>
+    </div>
+
+    <!-- Redesigned Search & Filter Header (Mockup 16) -->
+    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+        <div class="search-pill-container" style="margin: 0; max-width: 320px; flex-grow: 1;">
+            <input type="text" id="search" class="search-pill-input" placeholder="Search Listings..." style="padding: 12px 40px 12px 20px; font-size: 0.95rem;">
+            <span class="search-pill-icon">🔍</span>
+        </div>
+        <button id="filter-toggle" class="btn btn-filter" style="font-size: 0.95rem; padding: 10px 24px; min-width: auto; border-radius: 20px;">Filter <span>∨</span></button>
+    </div>
+
+    <!-- Filter Dropdown Card -->
+    <div id="filter-card" class="filter-dropdown-card" style="margin: -14px 0 24px auto;">
+        <div class="filter-section-title">Location</div>
+        <div class="form-group">
+            <input type="text" id="filter-location" class="form-input" style="border-radius: 20px; background-color: var(--bg-primary);" placeholder="Search Location...">
+        </div>
+        <div class="filter-section-title">Type</div>
+        <div class="filter-option-list" id="filter-type-list">
+            <div class="filter-option" data-value="hotel">Hotel</div>
+            <div class="filter-option" data-value="apartment">Apartment</div>
+            <div class="filter-option" data-value="dorm">Dorm</div>
+            <div class="filter-option" data-value="guest_room">Guest Room</div>
         </div>
     </div>
 
-    <div class="filter-bar">
-        <input type="text" id="search"          class="form-input" placeholder="🔍 Search by name…">
-        <input type="text" id="filter-location" class="form-input" placeholder="📍 Filter by location…">
-        <select id="filter-type" class="form-select">
-            <option value="">All Types</option>
-            <option value="hotel">Hotel</option>
-            <option value="apartment">Apartment</option>
-            <option value="dorm">Dorm</option>
-            <option value="guest_room">Guest Room</option>
-        </select>
-        <select id="sort-price" class="form-select">
-            <option value="">Sort by Price</option>
-            <option value="price_asc">Price: Low → High</option>
-            <option value="price_desc">Price: High → Low</option>
-        </select>
-        <button id="search-btn" class="btn btn-primary">Search</button>
-        <button id="clear-btn"  class="btn btn-outline">Clear</button>
-    </div>
-
-    <div id="count" style="color:var(--text-secondary); font-size:0.875rem; margin-bottom:12px;"></div>
+    <div id="count" style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:12px; font-weight: 600;"></div>
 
     <div id="listings-container">
         <div class="loading"><div class="spinner"></div><span>Loading all listings…</span></div>
@@ -49,17 +52,33 @@
     const user = requireAuth(['Admin']);
     if (user) { renderNav('/admin-listings.html'); fetchListings(); }
 
+    let selectedType = "";
+
+    // Toggle Filter card
+    const filterToggle = document.getElementById('filter-toggle');
+    const filterCard = document.getElementById('filter-card');
+
+    filterToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        filterCard.classList.toggle('open');
+        filterToggle.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!filterCard.contains(e.target) && e.target !== filterToggle) {
+            filterCard.classList.remove('open');
+            filterToggle.classList.remove('active');
+        }
+    });
+
     async function fetchListings() {
         const search   = document.getElementById('search').value.trim();
         const location = document.getElementById('filter-location').value.trim();
-        const type     = document.getElementById('filter-type').value;
-        const sort     = document.getElementById('sort-price').value;
 
         const params = new URLSearchParams();
-        if (search)   params.append('search',   search);
-        if (location) params.append('location', location);
-        if (type)     params.append('type',     type);
-        if (sort)     params.append('sort',     sort);
+        if (search)       params.append('search',   search);
+        if (location)     params.append('location', location);
+        if (selectedType) params.append('type',     selectedType);
 
         document.getElementById('listings-container').innerHTML =
             '<div class="loading"><div class="spinner"></div><span>Loading…</span></div>';
@@ -83,34 +102,32 @@
 
         c.innerHTML = `
             <div class="table-wrap">
-                <table>
+                <table class="admin-table">
                     <thead>
                         <tr>
-                            <th>Preview</th>
                             <th>Name</th>
-                            <th>Type</th>
+                            <th>Host</th>
                             <th>Location</th>
-                            <th>Price / Night</th>
-                            <th>Actions</th>
+                            <th>Type</th>
+                            <th>Price/night</th>
+                            <th style="width: 60px; text-align: center;"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${listings.map(l => `
+                        ${listings.map(l => {
+                            const hostName = l.hostId ? l.hostId.name : 'Unknown';
+                            return `
                             <tr>
-                                <td>
-                                    <img src="${l.image || ''}"
-                                         onerror="this.src='https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=80'"
-                                         style="width:52px; height:52px; object-fit:cover; border-radius:var(--radius-sm);">
-                                </td>
                                 <td><strong>${l.name}</strong></td>
-                                <td><span class="listing-type-badge inline">${l.type}</span></td>
+                                <td>${hostName}</td>
                                 <td style="color:var(--text-secondary);">📍 ${l.location}</td>
-                                <td style="color:var(--accent-2); font-weight:700;">₱${Number(l.price).toLocaleString()}</td>
-                                <td>
-                                    <button onclick="deleteListing('${l._id}')" class="btn btn-danger btn-sm">Delete</button>
+                                <td><span style="font-weight:600; text-transform:capitalize;">${l.type.replace('_',' ')}</span></td>
+                                <td style="font-weight:700;">₱${Number(l.price).toLocaleString()}</td>
+                                <td style="text-align: center;">
+                                    <button onclick="deleteListing('${l._id}')" class="admin-delete-btn" title="Delete Listing">❌</button>
                                 </td>
-                            </tr>
-                        `).join('')}
+                            </tr>`;
+                        }).join('')}
                     </tbody>
                 </table>
             </div>`;
@@ -120,27 +137,31 @@
         if (!confirm('Permanently delete this listing? This cannot be undone.')) return;
         try {
             await api('DELETE', '/listings/' + id);
-            showToast('Listing deleted.', 'success');
+            showToast('Listing deleted successfully.', 'success');
             fetchListings();
         } catch (err) {
             showToast(err.message, 'error');
         }
     }
 
-    // Event wiring
-    document.getElementById('search-btn').addEventListener('click', fetchListings);
-    document.getElementById('clear-btn').addEventListener('click', () => {
-        document.getElementById('search').value          = '';
-        document.getElementById('filter-location').value = '';
-        document.getElementById('filter-type').value     = '';
-        document.getElementById('sort-price').value      = '';
-        fetchListings();
+    // Wiring events
+    document.getElementById('search').addEventListener('input', fetchListings);
+    document.getElementById('filter-location').addEventListener('input', fetchListings);
+
+    const typeOptions = document.querySelectorAll('#filter-type-list .filter-option');
+    typeOptions.forEach(opt => {
+        opt.addEventListener('click', () => {
+            if (opt.classList.contains('selected')) {
+                opt.classList.remove('selected');
+                selectedType = "";
+            } else {
+                typeOptions.forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                selectedType = opt.getAttribute('data-value');
+            }
+            fetchListings();
+        });
     });
-    document.getElementById('filter-type').addEventListener('change',  fetchListings);
-    document.getElementById('sort-price').addEventListener('change',   fetchListings);
-    ['search', 'filter-location'].forEach(id =>
-        document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') fetchListings(); })
-    );
 </script>
 </body>
 </html>
