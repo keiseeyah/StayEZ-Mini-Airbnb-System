@@ -49,12 +49,8 @@
 
     function renderDetails(listing) {
         const price = listing.price ? `₱${Number(listing.price).toLocaleString()}` : 'N/A';
-        const img1 = listing.image || '/images/bedroom-balcony.jpg';
-        
-        // Stock related images to fill the thumbnail grid visually matching mockup 9
-        const img2 = '/images/bedroom-closet.jpg';
-        const img3 = '/images/home-bg.jpg';
-        const img4 = '/images/login-bg.jpg';
+        const mainImage = listing.image || '/images/bedroom-balcony.jpg';
+        const allImages = (listing.images && listing.images.length > 0) ? listing.images : [mainImage];
 
         document.getElementById('detail-container').innerHTML = `
             <!-- Back Arrow Navigation -->
@@ -63,14 +59,14 @@
             <div class="detail-layout">
                 <!-- Left Column: Primary Image & Thumbs Grid -->
                 <div class="detail-images-section">
-                    <img id="primary-view-img" src="${img1}" 
+                    <img id="primary-view-img" src="${mainImage}" 
                          onerror="this.src='/images/bedroom-balcony.jpg'"
                          class="detail-primary-image" alt="${listing.name}">
                     
                     <div class="detail-thumbs-grid">
-                        <img src="${img1}" class="detail-thumb" onclick="swapImage(this.src)">
-                        <img src="${img2}" class="detail-thumb" onclick="swapImage(this.src)">
-                        <img src="${img3}" class="detail-thumb" onclick="swapImage(this.src)">
+                        ${allImages.map(imgSrc => `
+                            <img src="${imgSrc}" class="detail-thumb" onclick="swapImage(this.src)" onerror="this.src='/images/bedroom-balcony.jpg'">
+                        `).join('')}
                     </div>
                 </div>
 

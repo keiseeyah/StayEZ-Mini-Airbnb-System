@@ -78,11 +78,14 @@
 
                 <!-- Attachment Upload Image Picker -->
                 <div class="form-group">
-                    <label class="form-label" for="f-image-text">IMAGE</label>
+                    <label class="form-label" for="f-image-text">IMAGES (Select one or more)</label>
                     <div class="input-with-attachment">
-                        <input type="text" id="f-image-text" class="form-input" placeholder="Upload property image..." readonly required>
+                        <input type="text" id="f-image-text" class="form-input" placeholder="Upload property images (first will be primary)..." readonly required>
                         <button type="button" class="attachment-btn" onclick="document.getElementById('f-image-file').click()">📎</button>
-                        <input type="file" id="f-image-file" accept="image/jpeg, image/png, image/webp" style="display: none;">
+                        <input type="file" id="f-image-file" accept="image/jpeg, image/png, image/webp" multiple style="display: none;">
+                    </div>
+                    <div id="image-previews-container" style="display: none; margin-top: 12px;">
+                        <div id="image-previews-grid" class="image-previews-grid"></div>
                     </div>
                 </div>
 
@@ -105,7 +108,7 @@
 <script>
     const user = requireAuth(['Host']);
     let editingId = null;
-    let currentListingImage = '';
+    let currentListingImages = [];
 
     if (user) { renderNav('/host-listings.html'); loadListings(); }
 
@@ -123,45 +126,89 @@
     const fileInput = document.getElementById('f-image-file');
     const filenameInput = document.getElementById('f-image-text');
 
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            filenameInput.value = file.name;
-            handleImageUpload(file);
+    fileInput.addEventListener('change', async (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+            const files = Array.from(e.target.files);
+            const submitBtn = document.getElementById('form-submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing images...';
+
+            for (const file of files) {
+                await handleImageUpload(file);
+            }
+
+            renderImagePreviews();
+            fileInput.value = ''; // Reset file input
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'POSTLISTING';
         }
     });
 
     async function handleImageUpload(file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = new Image();
-            img.onload = function() {
-                const maxDim = 800;
-                let width = img.width;
-                let height = img.height;
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const maxDim = 800;
+                    let width = img.width;
+                    let height = img.height;
 
-                if (width > maxDim || height > maxDim) {
-                    if (width > height) {
-                        height = Math.round((height * maxDim) / width);
-                        width = maxDim;
-                    } else {
-                        width = Math.round((width * maxDim) / height);
-                        height = maxDim;
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        } else {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
                     }
-                }
 
-                const canvas = document.createElement('canvas');
-                canvas.width = width;
-                canvas.height = height;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, width, height);
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
 
-                currentListingImage = canvas.toDataURL('image/jpeg', 0.85);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                    currentListingImages.push(dataUrl);
+                    resolve();
+                };
+                img.onerror = () => resolve();
+                img.src = e.target.result;
             };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+            reader.onerror = () => resolve();
+            reader.readAsDataURL(file);
+        });
     }
+
+    function renderImagePreviews() {
+        const grid = document.getElementById('image-previews-grid');
+        const container = document.getElementById('image-previews-container');
+
+        if (!currentListingImages || currentListingImages.length === 0) {
+            grid.innerHTML = '';
+            container.style.display = 'none';
+            filenameInput.value = '';
+            return;
+        }
+
+        container.style.display = 'block';
+        filenameInput.value = `${currentListingImages.length} image(s) selected`;
+
+        grid.innerHTML = currentListingImages.map((img, index) => `
+            <div class="image-preview-item">
+                <img src="${img}" onerror="this.src='/images/bedroom-balcony.jpg'">
+                <button type="button" class="remove-btn" onclick="removeImage(${index})">&times;</button>
+            </div>
+        `).join('');
+    }
+
+    window.removeImage = function(index) {
+        currentListingImages.splice(index, 1);
+        renderImagePreviews();
+    };
 
     /* ─ Load & Render Listings ─────────────────────────────────────────────── */
     async function loadListings() {
@@ -228,7 +275,8 @@
 
     function openCreateView() {
         editingId = null;
-        currentListingImage = '';
+        currentListingImages = [];
+        renderImagePreviews();
         
         document.getElementById('form-view-title').textContent = 'Create Listing';
         
@@ -252,7 +300,8 @@
 
     function triggerEditView(listing) {
         editingId = listing._id;
-        currentListingImage = listing.image || '';
+        currentListingImages = listing.images && listing.images.length > 0 ? [...listing.images] : (listing.image ? [listing.image] : []);
+        renderImagePreviews();
         
         document.getElementById('form-view-title').textContent = 'Edit Listing';
 
@@ -268,7 +317,7 @@
         document.getElementById('f-price').value = listing.price;
         document.getElementById('f-description').value = listing.description;
         document.getElementById('f-contact').value = listing.contactNumber;
-        filenameInput.value = listing.image ? 'Existing Image Saved' : '';
+        filenameInput.value = currentListingImages.length > 0 ? `${currentListingImages.length} image(s) loaded` : '';
         document.getElementById('form-error').style.display = 'none';
 
         // Check correct type checkbox
@@ -306,7 +355,8 @@
             price:         parseFloat(document.getElementById('f-price').value),
             location:      document.getElementById('f-location').value.trim(),
             description:   document.getElementById('f-description').value.trim(),
-            image:         currentListingImage || '/images/bedroom-balcony.jpg',
+            image:         currentListingImages[0] || '/images/bedroom-balcony.jpg',
+            images:        currentListingImages,
             contactNumber: document.getElementById('f-contact').value.trim(),
         };
 

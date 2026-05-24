@@ -19,37 +19,40 @@
         </p>
     </div>
 
-    <!-- Search Bar -->
-    <div class="search-pill-container">
-        <input type="text" id="search" class="search-pill-input" placeholder="Browse">
-        <span class="search-pill-icon">🔍</span>
-    </div>
-
-    <!-- Filter & Sort Buttons -->
-    <div class="filter-sort-buttons">
-        <button id="filter-toggle" class="btn btn-filter">Filter <span>∨</span></button>
-        <button id="sort-toggle" class="btn btn-sort">Sort <span>∨</span></button>
-    </div>
-
-    <!-- Filter Dropdown Card -->
-    <div id="filter-card" class="filter-dropdown-card">
-        <div class="filter-section-title">Location</div>
-        <div class="form-group">
-            <input type="text" id="filter-location" class="form-input" style="border-radius: 20px; background-color: var(--bg-primary);" placeholder="Search Location...">
+    <!-- Search, Filter & Sort Controls Row -->
+    <div class="search-controls-container">
+        <!-- Search Bar -->
+        <div class="search-pill-container">
+            <input type="text" id="search" class="search-pill-input" placeholder="Browse">
+            <span class="search-pill-icon">🔍</span>
         </div>
-        <div class="filter-section-title">Type</div>
-        <div class="filter-option-list" id="filter-type-list">
-            <div class="filter-option" data-value="hotel">Hotel</div>
-            <div class="filter-option" data-value="apartment">Apartment</div>
-            <div class="filter-option" data-value="dorm">Dorm</div>
-            <div class="filter-option" data-value="guest_room">Guest Room</div>
-        </div>
-    </div>
 
-    <!-- Sort Dropdown Card -->
-    <div id="sort-card" class="sort-dropdown-card">
-        <button class="sort-btn-option" data-value="price_asc">Ascending</button>
-        <button class="sort-btn-option" data-value="price_desc">Descending</button>
+        <!-- Filter Dropdown wrapper -->
+        <div class="dropdown-wrapper">
+            <button id="filter-toggle" class="btn btn-filter">Filter <span>∨</span></button>
+            <div id="filter-card" class="filter-dropdown-card">
+                <div class="filter-section-title">Location</div>
+                <div class="form-group">
+                    <input type="text" id="filter-location" class="form-input" style="border-radius: 20px; background-color: white;" placeholder="Search Location...">
+                </div>
+                <div class="filter-section-title">Type</div>
+                <div class="filter-option-list" id="filter-type-list">
+                    <div class="filter-option" data-value="hotel">Hotel</div>
+                    <div class="filter-option" data-value="apartment">Apartment</div>
+                    <div class="filter-option" data-value="dorm">Dorm</div>
+                    <div class="filter-option" data-value="guest_room">Guest Room</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sort Dropdown wrapper -->
+        <div class="dropdown-wrapper">
+            <button id="sort-toggle" class="btn btn-sort">Prices <span>∨</span></button>
+            <div id="sort-card" class="sort-dropdown-card">
+                <button class="sort-btn-option" data-value="price_desc">High to Low</button>
+                <button class="sort-btn-option" data-value="price_asc">Low to High</button>
+            </div>
+        </div>
     </div>
 
     <div id="results-info" style="color:var(--text-secondary); font-size:0.95rem; margin-bottom:16px; text-align: center; font-weight: 500;"></div>
@@ -90,11 +93,11 @@
 
     // Close dropdowns when clicking outside
     document.addEventListener('click', (e) => {
-        if (!filterCard.contains(e.target) && e.target !== filterToggle) {
+        if (!filterCard.contains(e.target) && !filterToggle.contains(e.target)) {
             filterCard.classList.remove('open');
             filterToggle.classList.remove('active');
         }
-        if (!sortCard.contains(e.target) && e.target !== sortToggle) {
+        if (!sortCard.contains(e.target) && !sortToggle.contains(e.target)) {
             sortCard.classList.remove('open');
             sortToggle.classList.remove('active');
         }

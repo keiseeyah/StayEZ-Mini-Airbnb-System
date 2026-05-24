@@ -25,6 +25,10 @@ const listingSchema = new mongoose.Schema({
         type: String,
         required: true // Storing as a URL string
     },
+    images: {
+        type: [String],
+        default: []
+    },
     hostId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
