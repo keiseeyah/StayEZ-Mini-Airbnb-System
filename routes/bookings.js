@@ -65,7 +65,7 @@ router.get('/mine', checkRole(['Guest']), async (req, res) => {
     try {
         const guestId  = req.userId;
         const bookings = await Booking.find({ guestId })
-            .populate('listingId', 'name location price image type contactNumber')
+            .populate('listingId', 'name location price image type contactNumber isRemoved')
             .sort({ createdAt: -1 });
 
         // Redact contact number unless booking is approved
@@ -91,7 +91,7 @@ router.get('/host', checkRole(['Host']), async (req, res) => {
         const listingIds = listings.map(l => l._id);
 
         const bookings = await Booking.find({ listingId: { $in: listingIds } })
-            .populate('listingId', 'name location price image type')
+            .populate('listingId', 'name location price image type isRemoved')
             .populate('guestId', 'name email')
             .sort({ createdAt: -1 });
 
@@ -115,7 +115,7 @@ router.get('/listing/:listingId', checkRole(['Host']), async (req, res) => {
         }
 
         const bookings = await Booking.find({ listingId })
-            .populate('listingId', 'name location price image type')
+            .populate('listingId', 'name location price image type isRemoved')
             .populate('guestId', 'name email')
             .sort({ createdAt: -1 });
 
@@ -179,7 +179,7 @@ router.put('/:id/status', checkRole(['Host']), async (req, res) => {
 router.get('/', checkRole(['Admin']), async (req, res) => {
     try {
         const bookings = await Booking.find()
-            .populate('listingId', 'name location type price')
+            .populate('listingId', 'name location type price isRemoved')
             .populate('guestId',   'name email')
             .sort({ createdAt: -1 });
 
@@ -189,15 +189,24 @@ router.get('/', checkRole(['Admin']), async (req, res) => {
     }
 });
 
-// ─── DELETE /api/bookings/:id ─── Guest cancels/deletes their booking ─────────
-router.delete('/:id', checkRole(['Guest']), async (req, res) => {
+router.delete('/:id', checkRole(['Guest', 'Host', 'Admin']), async (req, res) => {
     try {
         const booking = await Booking.findById(req.params.id);
         if (!booking) return res.status(404).json({ message: 'Booking not found.' });
 
-        // Verify this booking belongs to the logged-in Guest
-        if (booking.guestId.toString() !== req.userId) {
-            return res.status(403).json({ message: 'You do not own this booking.' });
+        if (req.userRole === 'Guest') {
+            // Verify this booking belongs to the logged-in Guest
+            if (booking.guestId.toString() !== req.userId) {
+                return res.status(403).json({ message: 'You do not own this booking.' });
+            }
+        } else if (req.userRole === 'Host') {
+            // Verify host owns the listing associated with this booking
+            if (booking.listingId) {
+                const listing = await Listing.findById(booking.listingId);
+                if (listing && listing.hostId.toString() !== req.userId) {
+                    return res.status(403).json({ message: 'You do not own the listing associated with this booking.' });
+                }
+            }
         }
 
         await Booking.findByIdAndDelete(req.params.id);
