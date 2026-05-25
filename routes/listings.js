@@ -88,6 +88,9 @@ router.delete('/:id', checkRole(['Host', 'Admin']), async (req, res) => {
         if (listing.isRemoved) {
             // Already soft-deleted: hard-delete from the database
             await Listing.findByIdAndDelete(req.params.id);
+            // Cascade delete any bookings referencing this listing
+            const Booking = require('../models/Booking');
+            await Booking.deleteMany({ listingId: req.params.id });
             res.status(200).json({ message: 'Listing permanently deleted from records.' });
         } else {
             // Soft-delete
