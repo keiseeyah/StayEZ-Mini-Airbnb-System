@@ -10,7 +10,7 @@
 <body>
 <nav id="main-nav"></nav>
 
-<div class="page-container">
+<div class="page-container" id="book-container">
     <div id="book-content">
         <div class="loading"><div class="spinner"></div><span>Loading listing details…</span></div>
     </div>
@@ -52,14 +52,20 @@
         const today    = new Date().toISOString().split('T')[0];
         const price    = listing.price ? `₱${Number(listing.price).toLocaleString()}` : 'N/A';
         const imgSrc   = listing.image || '/images/bedroom-balcony.jpg';
-
         document.getElementById('book-content').innerHTML = `
-            <!-- Back Arrow -->
-            <button class="back-btn-circle" onclick="window.history.back()">⬅</button>
-            
-            <div style="margin-bottom: 32px;">
-                <h1 class="page-title">Booking</h1>
-                <p style="color:var(--text-secondary); margin-top:4px;">Enter your details to reserve your stay and experiences</p>
+            <!-- Header Row with Back Button and Centered Title -->
+            <div style="display: grid; grid-template-columns: 42px 1fr 42px; align-items: center; margin-bottom: 32px; gap: 16px;">
+                <!-- Back Arrow Navigation -->
+                <button class="back-btn-circle" onclick="window.history.back()" aria-label="Go Back" style="margin-bottom: 0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </button>
+                
+                <div style="text-align: center;">
+                    <h1 class="page-title" style="margin: 0; line-height: 1.1;">Booking</h1>
+                    <p style="color:var(--text-secondary); margin-top:4px;">Enter your details to reserve your stay and experiences</p>
+                </div>
+                
+                <div></div> <!-- Spacer for grid balance -->
             </div>
 
             <div class="book-layout">
@@ -70,9 +76,14 @@
                          alt="${listing.name}"
                          style="width:100%; height:320px; object-fit:cover; border-radius:var(--radius-lg); box-shadow: var(--shadow-soft);">
                     <div style="padding: 24px 0 0;">
+                        <div style="margin-bottom: 12px;">
+                            <span class="listing-type-badge ${listing.type}">${listing.type.replace('_', ' ')}</span>
+                        </div>
                         <h2 style="font-family: var(--font-serif); font-size:2.2rem; font-weight:500; margin-bottom:6px;">${listing.name}</h2>
-                        <p style="color:var(--text-secondary); font-size:1.05rem; margin-bottom:4px;">${listing.type}</p>
-                        <p style="color:var(--text-secondary); font-size:1.05rem; font-style: italic; margin-bottom:20px;"><img src="/images/pin.png" class="loc-pin" alt="Location"> ${listing.location}</p>
+                        <p style="color:var(--text-secondary); font-size:1.05rem; font-style: italic; margin-bottom:20px; display: flex; align-items: center; gap: 6px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="color: var(--accent-brown);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            <span>${listing.location}</span>
+                        </p>
                         <div style="padding-top:16px; border-top:1px solid var(--border-light);">
                             <span style="font-size:1.4rem; font-weight:800; color:var(--accent-teal); text-transform: uppercase; letter-spacing: 0.5px;">
                                 ${price} / night

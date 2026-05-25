@@ -1386,6 +1386,11 @@ nav#main-nav {
 }
 
 /* ─── Select Dates Checkout Layout (Mockup 8) ────────────────────────────────── */
+#book-container {
+    max-width: 1200px !important;
+    margin: 0 auto;
+}
+
 .book-layout {
     display: grid;
     grid-template-columns: 1fr 1fr;
