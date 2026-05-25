@@ -90,13 +90,20 @@ function renderNav(activePage) {
 
     nav.innerHTML = `
         <div class="nav-inner">
+            <!-- Left: Brand Logo & Title -->
             <a href="${homeHref}" class="nav-brand">
                 <img src="/images/logo.png" class="nav-logo-circle" alt="StayEZ Logo" style="object-fit: cover;"> StayEZ
             </a>
-            <div class="nav-links" id="nav-links-inner">
+            
+            <!-- Center: Navigation links -->
+            <div class="nav-links-center">
                 ${links.map(l => `
                     <a href="${l.href}" class="nav-link ${activePage === l.href ? 'active' : ''}">${l.label}</a>
                 `).join('')}
+            </div>
+
+            <!-- Right: Actions/User Profile (Desktop) -->
+            <div class="nav-links-right">
                 ${user ? `
                     <div class="nav-user">
                         <div class="nav-avatar">${user.name[0].toUpperCase()}</div>
@@ -108,6 +115,24 @@ function renderNav(activePage) {
                     <a href="/register.html" class="btn btn-primary btn-sm">Sign Up</a>
                 `}
             </div>
+
+            <!-- Mobile collapsible menu (combines center + right options) -->
+            <div class="nav-links nav-links-mobile" id="nav-links-inner">
+                ${links.map(l => `
+                    <a href="${l.href}" class="nav-link ${activePage === l.href ? 'active' : ''}">${l.label}</a>
+                `).join('')}
+                ${user ? `
+                    <div class="nav-user" style="margin-top: 8px;">
+                        <div class="nav-avatar">${user.name[0].toUpperCase()}</div>
+                        <span class="nav-username" style="color: var(--text-primary); font-weight: 700;">${user.name.split(' ')[0]}</span>
+                    </div>
+                    <button onclick="logout()" class="btn btn-primary btn-sm btn-full" style="border-radius: 20px; margin-top: 8px;">Log Out</button>
+                ` : `
+                    <a href="/index.html"    class="btn btn-outline btn-sm btn-full" style="margin-top: 8px;">Login</a>
+                    <a href="/register.html" class="btn btn-primary btn-sm btn-full" style="margin-top: 8px;">Sign Up</a>
+                `}
+            </div>
+
             <button class="nav-toggle" onclick="document.getElementById('nav-links-inner').classList.toggle('open')">☰</button>
         </div>
     `;
