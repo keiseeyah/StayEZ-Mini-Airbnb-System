@@ -78,9 +78,9 @@
 
                 <!-- Attachment Upload Image Picker -->
                 <div class="form-group">
-                    <label class="form-label" for="f-image-text">IMAGES (Select one or more)</label>
+                    <label class="form-label" for="f-image-text">IMAGES (Paste URL + Enter, or select files)</label>
                     <div class="input-with-attachment">
-                        <input type="text" id="f-image-text" class="form-input" placeholder="Upload property images (first will be primary)..." readonly required>
+                        <input type="text" id="f-image-text" class="form-input" placeholder="Paste image URL (press Enter) or upload files...">
                         <button type="button" class="attachment-btn" onclick="document.getElementById('f-image-file').click()">📎</button>
                         <input type="file" id="f-image-file" accept="image/jpeg, image/png, image/webp" multiple style="display: none;">
                     </div>
@@ -142,6 +142,36 @@
 
             submitBtn.disabled = false;
             submitBtn.textContent = 'POSTLISTING';
+        }
+    });
+
+    // Support typing/pasting a URL and pressing Enter to add it
+    filenameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const val = filenameInput.value.trim();
+            if (val && !/^\d+ image\(s\) (selected|loaded)$/i.test(val)) {
+                currentListingImages.push(val);
+                renderImagePreviews();
+                filenameInput.value = '';
+                showToast('Image URL added!', 'success');
+            }
+        }
+    });
+
+    // Clear count message on focus so user can type/paste a URL easily
+    filenameInput.addEventListener('focus', () => {
+        const val = filenameInput.value.trim();
+        if (/^\d+ image\(s\) (selected|loaded)$/i.test(val)) {
+            filenameInput.value = '';
+        }
+    });
+
+    // Restore count message on blur if input was left empty
+    filenameInput.addEventListener('blur', () => {
+        const val = filenameInput.value.trim();
+        if (!val && currentListingImages.length > 0) {
+            filenameInput.value = `${currentListingImages.length} image(s) ${editingId ? 'loaded' : 'selected'}`;
         }
     });
 
@@ -351,6 +381,12 @@
             errEl.textContent   = "Please select a property type.";
             errEl.style.display = 'block';
             return;
+        }
+
+        // If there's a pending URL typed/pasted in the input that hasn't been submitted via Enter
+        const pendingUrl = filenameInput.value.trim();
+        if (pendingUrl && !/^\d+ image\(s\) (selected|loaded)$/i.test(pendingUrl)) {
+            currentListingImages.push(pendingUrl);
         }
 
         btn.disabled    = true;
