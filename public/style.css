@@ -1539,6 +1539,11 @@ table.admin-table tr.removed-row td strong {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
 }
 
+/* Custom Input Placeholder Styling */
+.welcome-card .form-input::placeholder {
+    color: rgba(33, 43, 41, 0.45) !important;
+}
+
 /* ─── Hero Landing View (Mockup 5) ──────────────────────────────────────────── */
 .hero-container {
     width: 100%;
