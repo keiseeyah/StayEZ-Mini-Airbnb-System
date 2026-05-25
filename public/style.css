@@ -1213,11 +1213,13 @@ nav#main-nav {
     display: flex;
     align-items: center;
     gap: 16px;
-    margin-bottom: 30px;
     flex-wrap: wrap;
 }
 
 .requests-stat-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 8px 20px;
     border-radius: 20px;
     font-size: 0.85rem;
