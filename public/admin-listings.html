@@ -37,6 +37,7 @@
                     <div class="filter-option" data-value="apartment">Apartment</div>
                     <div class="filter-option" data-value="dorm">Dorm</div>
                     <div class="filter-option" data-value="guest_room">Guest Room</div>
+                    <div class="filter-option" data-value="studio">Studio</div>
                 </div>
             </div>
         </div>
@@ -123,7 +124,7 @@
                             <tr>
                                 <td><strong>${l.name}</strong></td>
                                 <td>${hostName}</td>
-                                <td style="color:var(--text-secondary);">📍 ${l.location}</td>
+                                <td style="color:var(--text-secondary);"><img src="/images/pin.png" class="loc-pin" alt="Location"> ${l.location}</td>
                                 <td><span style="font-weight:600; text-transform:capitalize;">${l.type.replace('_',' ')}</span></td>
                                 <td style="font-weight:700;">₱${Number(l.price).toLocaleString()}</td>
                                 <td style="text-align: center;">

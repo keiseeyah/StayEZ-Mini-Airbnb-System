@@ -152,7 +152,7 @@ function listingCard(listing) {
             </div>
             <div class="listing-info">
                 <h3 class="listing-name">${listing.name}</h3>
-                <p class="listing-location">📍 ${listing.location}</p>
+                <p class="listing-location"><img src="/images/pin.png" class="loc-pin" alt="Location"> ${listing.location}</p>
                 <p class="listing-desc">${listing.description || ''}</p>
                 <div class="listing-footer">
                     <span class="listing-price">${price}<span class="listing-price-label">/night</span></span>

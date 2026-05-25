@@ -7,7 +7,7 @@ const listingSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        required: true // e.g., hotel, apartment, dorm, guest_room
+        required: true // e.g., hotel, apartment, dorm, guest_room, studio
     },
     location: {
         type: String,

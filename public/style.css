@@ -308,7 +308,7 @@ nav#main-nav {
 
 /* ─── Main Containers & Page Layout ─────────────────────────────────────────── */
 .page-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 40px 24px 80px;
 }
@@ -452,6 +452,7 @@ nav#main-nav {
     margin: 0 auto 30px;
     width: 100%;
 }
+
 .search-pill-container {
     position: relative;
     flex: 1;
@@ -839,8 +840,8 @@ nav#main-nav {
 /* ─── Cards & Grid System ───────────────────────────────────────────────────── */
 .listing-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
     padding: 8px 0;
 }
 
@@ -869,7 +870,7 @@ nav#main-nav {
 
 .listing-img-wrap {
     position: relative;
-    height: 170px;
+    height: 140px;
     /* Shorter image height matching mockup ratio */
     overflow: hidden;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -901,7 +902,7 @@ nav#main-nav {
 }
 
 .listing-info {
-    padding: 20px;
+    padding: 16px;
     /* Slightly shorter padding for a compact layout */
     display: flex;
     flex-direction: column;
@@ -910,18 +911,28 @@ nav#main-nav {
 
 .listing-name {
     font-family: var(--font-serif);
-    font-size: 1.3rem;
+    font-size: 1.12rem;
+    line-height: 1.35;
     /* Slightly smaller to fit 4-column layout */
     font-weight: 500;
     margin-bottom: 4px;
 }
 
 .listing-location {
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     font-style: italic;
     color: var(--text-light-muted);
-    margin-bottom: 16px;
+    margin-bottom: 40px;
     /* Space before footer */
+}
+
+.loc-pin {
+    width: 1.1em;
+    height: 1.1em;
+    vertical-align: middle;
+    margin-right: 4px;
+    display: inline-block;
+    object-fit: contain;
 }
 
 .listing-desc {
@@ -938,12 +949,12 @@ nav#main-nav {
 
 .listing-price {
     font-family: var(--font-serif);
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     font-weight: 700;
 }
 
 .listing-price-label {
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     font-weight: 400;
     color: var(--text-light-muted);
 }
@@ -953,8 +964,8 @@ nav#main-nav {
     color: var(--text-light);
     border-radius: 30px;
     /* Fully rounded pill shape */
-    padding: 8px 20px;
-    font-size: 0.85rem;
+    padding: 6px 14px;
+    font-size: 0.78rem;
     font-weight: 600;
 }
 
@@ -1015,12 +1026,17 @@ nav#main-nav {
     box-shadow: var(--shadow-soft);
     margin-bottom: 24px;
 }
-.booking-card.removed, .host-listing-card.removed, .request-card.removed {
+
+.booking-card.removed,
+.host-listing-card.removed,
+.request-card.removed {
     background-color: #4b5553 !important;
     opacity: 0.85;
     border: 1px dashed rgba(255, 255, 255, 0.25);
 }
-.booking-card.removed .status-pill, .request-card.removed .status-pill {
+
+.booking-card.removed .status-pill,
+.request-card.removed .status-pill {
     opacity: 0.8;
 }
 
@@ -1330,6 +1346,7 @@ table.admin-table tr.removed-row td {
     color: #8c9694 !important;
     opacity: 0.8;
 }
+
 table.admin-table tr.removed-row td strong {
     color: #8c9694 !important;
 }
@@ -1685,6 +1702,7 @@ table.admin-table tr.removed-row td strong {
     font-size: 1.1rem;
     flex-shrink: 0;
 }
+
 .toast.toast-error {
     background-color: var(--danger);
     color: #ffffff;
@@ -1750,6 +1768,7 @@ table.admin-table tr.removed-row td strong {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     animation: fadeIn 0.2s ease-out;
 }
+
 .error-box::before {
     content: "⚠️";
     font-size: 1.1rem;
@@ -1763,6 +1782,7 @@ table.admin-table tr.removed-row td strong {
         opacity: 0;
         transform: translateY(-4px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);

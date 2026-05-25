@@ -1,44 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StayEZ — Home</title>
-    <meta name="description" content="Welcome to StayEZ, your premium mini Airbnb platform for finding and booking the perfect stay.">
+    <meta name="description"
+        content="Welcome to StayEZ, your premium mini Airbnb platform for finding and booking the perfect stay.">
     <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
 
-<nav id="main-nav" style="display: none;"></nav>
+    <nav id="main-nav" style="display: none;"></nav>
 
-<div id="main-content">
-    <div class="loading"><div class="spinner"></div><span>Loading StayEZ…</span></div>
-</div>
+    <div id="main-content">
+        <div class="loading">
+            <div class="spinner"></div><span>Loading StayEZ…</span>
+        </div>
+    </div>
 
-<script src="/app.js"></script>
-<script>
-    const existing = getUser();
-    if (existing) {
-        if (existing.role === 'Host') {
-            window.location.href = '/host-listings.html';
-        } else if (existing.role === 'Admin') {
-            window.location.href = '/admin-listings.html';
-        } else if (existing.role === 'Guest') {
-            // Render guest home hero layout (Mockup 5)
-            document.getElementById('main-nav').style.display = 'block';
-            renderNav('/index.html');
-            
-            document.getElementById('main-content').innerHTML = `
+    <script src="/app.js"></script>
+    <script>
+        const existing = getUser();
+        if (existing) {
+            if (existing.role === 'Host') {
+                window.location.href = '/host-listings.html';
+            } else if (existing.role === 'Admin') {
+                window.location.href = '/admin-listings.html';
+            } else if (existing.role === 'Guest') {
+                // Render guest home hero layout (Mockup 5)
+                document.getElementById('main-nav').style.display = 'block';
+                renderNav('/index.html');
+
+                document.getElementById('main-content').innerHTML = `
                 <div class="hero-container">
                     <h1 class="hero-title">Take it easy<br><span>StayEZ</span></h1>
                     <a href="/listings.html" class="btn btn-hero-browse">BROWSE</a>
                 </div>
             `;
-        }
-    } else {
-        // Render welcome login card view (Mockup 1)
-        document.body.classList.add('welcome-page');
-        document.getElementById('main-content').innerHTML = `
+            }
+        } else {
+            // Render welcome login card view (Mockup 1)
+            document.body.classList.add('welcome-page');
+            document.getElementById('main-content').innerHTML = `
             <div class="welcome-card">
                 <h2 class="welcome-title">Welcome</h2>
                 <form id="login-form">
@@ -59,36 +64,37 @@
             </div>
         `;
 
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn   = document.getElementById('login-btn');
-            const errEl = document.getElementById('login-error');
+            document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('login-btn');
+                const errEl = document.getElementById('login-error');
 
-            errEl.style.display = 'none';
-            btn.disabled    = true;
-            btn.textContent = 'Logging in…';
+                errEl.style.display = 'none';
+                btn.disabled = true;
+                btn.textContent = 'Logging in…';
 
-            try {
-                const user = await api('POST', '/auth/login', {
-                    email:    document.getElementById('email').value.trim(),
-                    password: document.getElementById('password').value,
-                });
-                saveUser(user);
-                if (user.role === 'Guest') {
-                    window.location.href = '/index.html'; // Reload to show home hero view
-                } else if (user.role === 'Host') {
-                    window.location.href = '/host-listings.html';
-                } else {
-                    window.location.href = '/admin-listings.html';
+                try {
+                    const user = await api('POST', '/auth/login', {
+                        email: document.getElementById('email').value.trim(),
+                        password: document.getElementById('password').value,
+                    });
+                    saveUser(user);
+                    if (user.role === 'Guest') {
+                        window.location.href = '/index.html'; // Reload to show home hero view
+                    } else if (user.role === 'Host') {
+                        window.location.href = '/host-listings.html';
+                    } else {
+                        window.location.href = '/admin-listings.html';
+                    }
+                } catch (err) {
+                    errEl.textContent = err.message;
+                    errEl.style.display = 'block';
+                    btn.disabled = false;
+                    btn.textContent = 'Log in';
                 }
-            } catch (err) {
-                errEl.textContent    = err.message;
-                errEl.style.display  = 'block';
-                btn.disabled         = false;
-                btn.textContent      = 'Log in';
-            }
-        });
-    }
-</script>
+            });
+        }
+    </script>
 </body>
+
 </html>
