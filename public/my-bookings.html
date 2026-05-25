@@ -79,7 +79,7 @@
                             <img src="${imgSrc}"
                                  onerror="this.src='/images/bedroom-balcony.jpg'"
                                  alt="${name}">
-                            <span class="ribbon-badge">${type}</span>
+                            <span class="ribbon-badge ${type}">${type.replace('_', ' ')}</span>
                         </div>
 
                         <!-- Right details -->
@@ -94,7 +94,10 @@
                                     ${statusBadge(b.status)}
                                 </div>
                             </div>
-                            <p class="booking-location"><img src="/images/pin.png" class="loc-pin" alt="Location"> ${location}</p>
+                            <p class="booking-location" style="display: flex; align-items: center; gap: 4px; margin-bottom: 8px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="loc-pin-svg" viewBox="0 0 24 24" style="color: var(--text-light-muted);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                <span>${location}</span>
+                            </p>
                             <p class="booking-dates">Dates: ${formatDate(b.startDate)} - ${formatDate(b.endDate)}</p>
                         </div>
                     </div>

@@ -148,11 +148,14 @@ function listingCard(listing) {
                 <img src="${img}" alt="${listing.name}"
                      onerror="this.src='/images/bedroom-balcony.jpg'"
                      loading="lazy">
-                <span class="ribbon-badge">${listing.type}</span>
+                <span class="ribbon-badge ${listing.type}">${listing.type.replace('_', ' ')}</span>
             </div>
             <div class="listing-info">
                 <h3 class="listing-name">${listing.name}</h3>
-                <p class="listing-location"><img src="/images/pin.png" class="loc-pin" alt="Location"> ${listing.location}</p>
+                <p class="listing-location" style="display: flex; align-items: center; gap: 4px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="loc-pin-svg" viewBox="0 0 24 24" style="color: var(--text-light-muted);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span>${listing.location}</span>
+                </p>
                 <p class="listing-desc">${listing.description || ''}</p>
                 <div class="listing-footer">
                     <span class="listing-price">${price}<span class="listing-price-label">/night</span></span>

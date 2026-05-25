@@ -334,24 +334,27 @@ nav#main-nav {
     font-weight: 500;
 }
 
-/* ─── Back Button shape ──────────────────────────────────────────────────────── */
 .back-btn-circle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
-    background-color: transparent;
+    width: 42px;
+    height: 42px;
+    background-color: rgba(255, 255, 255, 0.85);
     color: var(--text-primary);
-    border: none;
-    font-size: 1.75rem;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 50%;
     cursor: pointer;
-    margin-bottom: 20px;
-    transition: transform var(--transition);
+    margin-bottom: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .back-btn-circle:hover {
+    background-color: #ffffff;
     transform: translateX(-4px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    color: var(--accent-teal);
 }
 
 /* ─── Buttons ───────────────────────────────────────────────────────────────── */
@@ -481,8 +484,10 @@ nav#main-nav {
     right: 22px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 1.25rem;
-    color: var(--text-primary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
     pointer-events: none;
 }
 
@@ -538,6 +543,25 @@ nav#main-nav {
     background-color: var(--accent-teal);
     color: var(--text-light);
     border-color: var(--accent-teal);
+}
+
+.dropdown-caret {
+    display: inline-block;
+    width: 13px;
+    height: 13px;
+    margin-left: 8px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23212b29' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    vertical-align: middle;
+    transition: transform var(--transition);
+}
+
+.btn-filter.active .dropdown-caret,
+.btn-sort.active .dropdown-caret {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23ffffff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    transform: rotate(180deg);
 }
 
 /* Mobile responsive layout for search, filter & sort */
@@ -739,6 +763,18 @@ nav#main-nav {
 .form-textarea {
     resize: vertical;
     min-height: 120px;
+}
+
+.form-select {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23212b29' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 20px center !important;
+    background-size: 14px !important;
+    padding-right: 46px !important;
+    cursor: pointer;
 }
 
 /* Checkbox layout matching create/edit listings type options */
@@ -1130,6 +1166,11 @@ nav#main-nav {
 }
 
 /* ─── Detail View (Mockup 9) ────────────────────────────────────────────────── */
+#detail-container {
+    max-width: 1200px !important;
+    margin: 0 auto;
+}
+
 .detail-layout {
     display: flex;
     gap: 40px;
@@ -1138,6 +1179,7 @@ nav#main-nav {
 
 .detail-images-section {
     flex: 1;
+    min-width: 0;
 }
 
 .detail-primary-image {
@@ -1162,15 +1204,94 @@ nav#main-nav {
     border-radius: var(--radius-md);
     cursor: pointer;
     box-shadow: var(--shadow-soft);
-    transition: transform var(--transition);
+    border: 2px solid transparent;
+    transition: transform var(--transition), border var(--transition), box-shadow var(--transition);
 }
 
 .detail-thumb:hover {
     transform: scale(1.03);
 }
 
+/* Thumbs horizontal carousel for > 5 images */
+.detail-thumbs-carousel-wrapper {
+    position: relative;
+    width: 100%;
+    padding: 0 40px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+}
+
+.detail-thumbs-scroll-container {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    width: 100%;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+    padding: 4px 0;
+}
+
+.detail-thumbs-scroll-container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}
+
+.detail-thumbs-scroll-container .detail-thumb {
+    width: calc((100% - 36px) / 4) !important;
+    min-width: calc((100% - 36px) / 4) !important;
+    max-width: calc((100% - 36px) / 4) !important;
+    flex: 0 0 calc((100% - 36px) / 4) !important;
+    height: 80px !important;
+}
+
+.detail-thumb.active {
+    border: 2px solid var(--accent-teal);
+    box-shadow: 0 0 10px rgba(36, 62, 60, 0.25);
+    transform: scale(1.03);
+}
+
+.carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: var(--text-primary);
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transition: all var(--transition);
+    z-index: 10;
+}
+
+.carousel-arrow.prev-arrow {
+    left: 0;
+}
+
+.carousel-arrow.next-arrow {
+    right: 0;
+}
+
+.carousel-arrow:hover {
+    background-color: #ffffff;
+    color: var(--accent-teal);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transform: translateY(-50%) scale(1.05);
+}
+
+.carousel-arrow:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
 .detail-info-section {
     flex: 1;
+    min-width: 0;
 }
 
 .detail-header-row {
@@ -1183,13 +1304,78 @@ nav#main-nav {
 }
 
 .detail-price-badge {
-    background-color: var(--bg-card-grey);
+    background-color: rgba(36, 62, 60, 0.08);
+    border: 1px solid rgba(36, 62, 60, 0.15);
     padding: 10px 24px;
-    border-radius: 24px;
+    border-radius: 30px;
     font-family: var(--font-serif);
-    font-size: 1.15rem;
+    font-size: 1.25rem;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--accent-teal);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+/* Category-Specific Badge Colors for Distinguishing Stays */
+.listing-type-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-radius: 20px;
+    background-color: rgba(36, 62, 60, 0.08);
+    color: var(--accent-teal);
+    border: 1px solid rgba(36, 62, 60, 0.15);
+    transition: all var(--transition);
+}
+
+.listing-type-badge.apartment {
+    background-color: rgba(217, 93, 57, 0.1) !important;
+    color: #d95d39 !important;
+    border: 1px solid rgba(217, 93, 57, 0.2) !important;
+}
+
+.listing-type-badge.hotel {
+    background-color: rgba(36, 62, 60, 0.1) !important;
+    color: #243e3c !important;
+    border: 1px solid rgba(36, 62, 60, 0.2) !important;
+}
+
+.listing-type-badge.dorm {
+    background-color: rgba(124, 58, 237, 0.1) !important;
+    color: #7c3aed !important;
+    border: 1px solid rgba(124, 58, 237, 0.2) !important;
+}
+
+.listing-type-badge.guest_room {
+    background-color: rgba(37, 99, 235, 0.1) !important;
+    color: #2563eb !important;
+    border: 1px solid rgba(37, 99, 235, 0.2) !important;
+}
+
+.listing-type-badge.studio {
+    background-color: rgba(6, 182, 212, 0.1) !important;
+    color: #0891b2 !important;
+    border: 1px solid rgba(6, 182, 212, 0.2) !important;
+}
+
+/* Color codes for ribbon badges on listing grids */
+.ribbon-badge.apartment {
+    background-color: #d95d39 !important;
+}
+.ribbon-badge.hotel {
+    background-color: #243e3c !important;
+}
+.ribbon-badge.dorm {
+    background-color: #7c3aed !important;
+}
+.ribbon-badge.guest_room {
+    background-color: #2563eb !important;
+}
+.ribbon-badge.studio {
+    background-color: #0891b2 !important;
 }
 
 .detail-desc {
