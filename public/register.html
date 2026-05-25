@@ -26,13 +26,12 @@
             <input type="password" id="password" class="form-input" required minlength="6" autocomplete="new-password">
         </div>
         <div class="form-group" style="margin-bottom: 30px;">
-            <label class="form-label" for="role">I want to…</label>
-            <select id="role" class="form-select" required>
-                <option value="" disabled selected>Select your role</option>
-                <option value="Guest">Guest</option>
-                <option value="Host">Host</option>
-                <option value="Admin">Admin</option>
-            </select>
+            <label class="form-label">I want to be a…</label>
+            <div class="role-toggle-group">
+                <button type="button" class="role-toggle-btn active" data-role="Guest">Guest</button>
+                <button type="button" class="role-toggle-btn" data-role="Host">Host</button>
+            </div>
+            <input type="hidden" id="role" value="Guest" required>
         </div>
         <div id="reg-error" class="error-box"></div>
         <button type="submit" id="reg-btn" class="welcome-btn-login">Create Account</button>
@@ -45,6 +44,18 @@
 
 <script src="/app.js"></script>
 <script>
+    // Toggle role selector buttons
+    const roleBtns = document.querySelectorAll('.role-toggle-btn');
+    const roleInput = document.getElementById('role');
+
+    roleBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            roleBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            roleInput.value = btn.getAttribute('data-role');
+        });
+    });
+
     document.getElementById('register-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn   = document.getElementById('reg-btn');
@@ -59,7 +70,7 @@
                 name:     document.getElementById('name').value.trim(),
                 email:    document.getElementById('email').value.trim(),
                 password: document.getElementById('password').value,
-                role:     document.getElementById('role').value,
+                role:     roleInput.value,
             });
             showToast('Account created! Please sign in.', 'success');
             setTimeout(() => window.location.href = '/index.html', 1600);
