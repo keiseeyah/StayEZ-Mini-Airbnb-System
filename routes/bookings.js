@@ -189,7 +189,7 @@ router.get('/', checkRole(['Admin']), async (req, res) => {
     }
 });
 
-router.delete('/:id', checkRole(['Guest', 'Host', 'Admin']), async (req, res) => {
+router.delete('/:id', checkRole(['Guest', 'Host']), async (req, res) => {
     try {
         const booking = await Booking.findById(req.params.id);
         if (!booking) return res.status(404).json({ message: 'Booking not found.' });
