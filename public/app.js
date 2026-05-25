@@ -91,7 +91,7 @@ function renderNav(activePage) {
     nav.innerHTML = `
         <div class="nav-inner">
             <a href="${homeHref}" class="nav-brand">
-                <div class="nav-logo-circle">🗺️</div> StayEZ
+                <img src="/images/logo.png" class="nav-logo-circle" alt="StayEZ Logo" style="object-fit: cover;"> StayEZ
             </a>
             <div class="nav-links" id="nav-links-inner">
                 ${links.map(l => `
