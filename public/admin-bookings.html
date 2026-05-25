@@ -27,17 +27,18 @@
                     style="padding: 12px 40px 12px 20px; font-size: 0.95rem;">
                 <span class="search-pill-icon">🔍</span>
             </div>
-            <button id="status-filter-toggle" class="btn btn-filter"
-                style="font-size: 0.95rem; padding: 10px 24px; min-width: auto; border-radius: 20px;">Status
-                <span>∨</span></button>
-        </div>
-
-        <!-- Status Dropdown Card -->
-        <div id="status-card" class="sort-dropdown-card" style="margin: -14px 0 24px auto; width: 160px;">
-            <button class="sort-btn-option" data-value="">All Statuses</button>
-            <button class="sort-btn-option" data-value="pending">Pending</button>
-            <button class="sort-btn-option" data-value="approved">Approved</button>
-            <button class="sort-btn-option" data-value="rejected">Rejected</button>
+            <div class="dropdown-wrapper">
+                <button id="status-filter-toggle" class="btn btn-filter"
+                    style="font-size: 0.95rem; padding: 10px 24px; min-width: auto; border-radius: 20px;">Status
+                    <span>∨</span></button>
+                <!-- Status Dropdown Card -->
+                <div id="status-card" class="sort-dropdown-card" style="width: 160px;">
+                    <button class="sort-btn-option" data-value="">All Statuses</button>
+                    <button class="sort-btn-option" data-value="pending">Pending</button>
+                    <button class="sort-btn-option" data-value="approved">Approved</button>
+                    <button class="sort-btn-option" data-value="rejected">Rejected</button>
+                </div>
+            </div>
         </div>
 
         <div id="bookings-container">
@@ -66,7 +67,7 @@
         });
 
         document.addEventListener('click', (e) => {
-            if (!statusCard.contains(e.target) && e.target !== statusToggle) {
+            if (!statusCard.contains(e.target) && !statusToggle.contains(e.target)) {
                 statusCard.classList.remove('open');
                 statusToggle.classList.remove('active');
             }
@@ -90,7 +91,7 @@
             let filtered = allBookings;
 
             if (selectedStatus) {
-                filtered = filtered.filter(b => b.status === selectedStatus);
+                filtered = filtered.filter(b => b.status && b.status.toLowerCase() === selectedStatus.toLowerCase());
             }
 
             if (searchVal) {
@@ -132,9 +133,10 @@
                     </thead>
                     <tbody>
                         ${bookings.map(b => {
-                const bookingIdShort = b._id.substring(b._id.length - 8).toUpperCase();
+                const bookingIdShort = b._id ? b._id.substring(b._id.length - 8).toUpperCase() : 'N/A';
                 const guestName = b.guestId ? b.guestId.name : 'N/A';
                 const listingName = b.listingId ? b.listingId.name : 'Listing Removed';
+                const statusVal = b.status || 'pending';
                 return `
                             <tr>
                                 <td><span style="font-family: monospace; font-weight: 700; color: var(--text-secondary);">#${bookingIdShort}</span></td>
@@ -143,8 +145,8 @@
                                 <td>${formatDate(b.startDate)}</td>
                                 <td>${formatDate(b.endDate)}</td>
                                 <td style="text-align: center;">
-                                    <span class="status-pill ${b.status.toLowerCase()}" style="padding: 6px 16px; font-size: 0.72rem; border-radius: 15px; border: none; font-weight: 700;">
-                                        ${b.status}
+                                    <span class="status-pill ${statusVal.toLowerCase()}" style="padding: 6px 16px; font-size: 0.72rem; border-radius: 15px; border: none; font-weight: 700;">
+                                        ${statusVal}
                                     </span>
                                 </td>
                             </tr>`;
