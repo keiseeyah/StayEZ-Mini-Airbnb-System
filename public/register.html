@@ -10,6 +10,9 @@
 <body class="welcome-page">
 
 <div class="welcome-card">
+    <div class="welcome-logo-container">
+        <img src="/images/logo.png" alt="StayEZ Logo" class="welcome-logo">
+    </div>
     <h2 class="welcome-title">Create Account</h2>
 
     <form id="register-form">
@@ -23,13 +26,27 @@
         </div>
         <div class="form-group">
             <label class="form-label" for="password">Password</label>
-            <input type="password" id="password" class="form-input" placeholder="Create a password (min. 6 characters)" required minlength="6" autocomplete="new-password">
+            <div class="input-wrapper">
+                <input type="password" id="password" class="form-input" placeholder="Create a password" required autocomplete="new-password">
+                <button type="button" class="password-toggle-btn" id="password-toggle">👁️</button>
+            </div>
+            <div class="password-requirements">
+                <div class="req-item" id="req-length">❌ At least 8 characters</div>
+                <div class="req-item" id="req-number">❌ Contains a number or special character</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="confirm-password">Confirm Password</label>
+            <div class="input-wrapper">
+                <input type="password" id="confirm-password" class="form-input" placeholder="Confirm your password" required autocomplete="new-password">
+                <button type="button" class="password-toggle-btn" id="confirm-password-toggle">👁️</button>
+            </div>
         </div>
         <div class="form-group" style="margin-bottom: 30px;">
             <label class="form-label">I want to be a…</label>
-            <div class="role-toggle-group">
-                <button type="button" class="role-toggle-btn active" data-role="Guest">Guest</button>
-                <button type="button" class="role-toggle-btn" data-role="Host">Host</button>
+            <div class="role-segmented-control">
+                <button type="button" class="role-segmented-btn active" data-role="Guest">Guest</button>
+                <button type="button" class="role-segmented-btn" data-role="Host">Host</button>
             </div>
             <input type="hidden" id="role" value="Guest" required>
         </div>
@@ -45,7 +62,7 @@
 <script src="/app.js"></script>
 <script>
     // Toggle role selector buttons
-    const roleBtns = document.querySelectorAll('.role-toggle-btn');
+    const roleBtns = document.querySelectorAll('.role-segmented-btn');
     const roleInput = document.getElementById('role');
 
     roleBtns.forEach(btn => {
@@ -56,12 +73,90 @@
         });
     });
 
+    // Toggle password visibility
+    const pwdInput = document.getElementById('password');
+    const pwdToggle = document.getElementById('password-toggle');
+    pwdToggle.addEventListener('click', () => {
+        if (pwdInput.type === 'password') {
+            pwdInput.type = 'text';
+            pwdToggle.textContent = '🙈';
+        } else {
+            pwdInput.type = 'password';
+            pwdToggle.textContent = '👁️';
+        }
+    });
+
+    const confirmInput = document.getElementById('confirm-password');
+    const confirmToggle = document.getElementById('confirm-password-toggle');
+    confirmToggle.addEventListener('click', () => {
+        if (confirmInput.type === 'password') {
+            confirmInput.type = 'text';
+            confirmToggle.textContent = '🙈';
+        } else {
+            confirmInput.type = 'password';
+            confirmToggle.textContent = '👁️';
+        }
+    });
+
+    // Password strength requirements checklist validation
+    const reqLength = document.getElementById('req-length');
+    const reqNumber = document.getElementById('req-number');
+
+    pwdInput.addEventListener('input', () => {
+        const val = pwdInput.value;
+        
+        // 1. Length validation (8+ characters)
+        if (val.length >= 8) {
+            reqLength.classList.add('valid');
+            reqLength.innerHTML = '✔️ At least 8 characters';
+        } else {
+            reqLength.classList.remove('valid');
+            reqLength.innerHTML = '❌ At least 8 characters';
+        }
+
+        // 2. Number or special char validation
+        const hasNumberOrSpec = /[0-9!@#$%^&*(),.?":{}|<>]/.test(val);
+        if (hasNumberOrSpec) {
+            reqNumber.classList.add('valid');
+            reqNumber.innerHTML = '✔️ Contains a number or special character';
+        } else {
+            reqNumber.classList.remove('valid');
+            reqNumber.innerHTML = '❌ Contains a number or special character';
+        }
+    });
+
     document.getElementById('register-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn   = document.getElementById('reg-btn');
         const errEl = document.getElementById('reg-error');
 
         errEl.style.display = 'none';
+
+        const pwd = pwdInput.value;
+        const confirmPwd = confirmInput.value;
+
+        // Validate length
+        if (pwd.length < 8) {
+            errEl.textContent = 'Password must be at least 8 characters long.';
+            errEl.style.display = 'block';
+            return;
+        }
+
+        // Validate number or special char
+        const hasNumberOrSpec = /[0-9!@#$%^&*(),.?":{}|<>]/.test(pwd);
+        if (!hasNumberOrSpec) {
+            errEl.textContent = 'Password must contain at least 1 number or special character.';
+            errEl.style.display = 'block';
+            return;
+        }
+
+        // Validate match
+        if (pwd !== confirmPwd) {
+            errEl.textContent = 'Passwords do not match.';
+            errEl.style.display = 'block';
+            return;
+        }
+
         btn.disabled    = true;
         btn.textContent = 'Creating account…';
 
@@ -69,7 +164,7 @@
             await api('POST', '/auth/register', {
                 name:     document.getElementById('name').value.trim(),
                 email:    document.getElementById('email').value.trim(),
-                password: document.getElementById('password').value,
+                password: pwd,
                 role:     roleInput.value,
             });
             showToast('Account created! Please sign in.', 'success');

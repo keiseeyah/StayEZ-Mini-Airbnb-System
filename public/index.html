@@ -45,7 +45,10 @@
             document.body.classList.add('welcome-page');
             document.getElementById('main-content').innerHTML = `
             <div class="welcome-card">
-                <h2 class="welcome-title">Welcome</h2>
+                <div class="welcome-logo-container">
+                    <img src="/images/logo.png" alt="StayEZ Logo" class="welcome-logo">
+                </div>
+                <h2 class="welcome-title"><span class="brand-italic">Welcome to</span> StayEZ</h2>
                 <form id="login-form">
                     <div class="form-group">
                         <label class="form-label" for="email">Email</label>
@@ -53,7 +56,10 @@
                     </div>
                     <div class="form-group" style="margin-bottom: 30px;">
                         <label class="form-label" for="password">Password</label>
-                        <input type="password" id="password" class="form-input" placeholder="Enter your password" required autocomplete="current-password">
+                        <div class="input-wrapper">
+                            <input type="password" id="password" class="form-input" placeholder="Enter your password" required autocomplete="current-password">
+                            <button type="button" class="password-toggle-btn" id="password-toggle">👁️</button>
+                        </div>
                     </div>
                     <div id="login-error" class="error-box"></div>
                     <button type="submit" id="login-btn" class="welcome-btn-login">Log in</button>
@@ -64,7 +70,19 @@
             </div>
         `;
 
-            document.getElementById('login-form').addEventListener('submit', async (e) => {
+        const pwdInput = document.getElementById('password');
+        const pwdToggle = document.getElementById('password-toggle');
+        pwdToggle.addEventListener('click', () => {
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                pwdToggle.textContent = '🙈';
+            } else {
+                pwdInput.type = 'password';
+                pwdToggle.textContent = '👁️';
+            }
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = document.getElementById('login-btn');
                 const errEl = document.getElementById('login-error');

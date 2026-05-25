@@ -1377,7 +1377,7 @@ table.admin-table tr.removed-row td strong {
     background: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)),
         url('/images/login-bg.jpg') no-repeat center center;
     background-size: cover;
-    padding: 40px 24px;
+    padding: 8px 24px;
 }
 
 .welcome-page #main-content {
@@ -1388,50 +1388,48 @@ table.admin-table tr.removed-row td strong {
 }
 
 .welcome-card {
-    width: 80%;
-    max-width: 1100px;
-    /* Wider layout matching the mockup ratio */
-    background-color: rgba(36, 62, 60, 0.82);
-    /* Glass dark teal */
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    width: 90%;
+    max-width: 720px;
+    background: linear-gradient(135deg, rgba(46, 78, 75, 0.65) 0%, rgba(30, 52, 50, 0.72) 50%, rgba(18, 32, 31, 0.78) 100%) !important;
+    backdrop-filter: blur(32px) !important;
+    -webkit-backdrop-filter: blur(32px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.16) !important;
     border-radius: 40px;
-    /* Large rounded corners */
-    padding: 64px 100px;
-    /* More spacious horizontal padding */
+    padding: 24px 40px;
     color: var(--text-light);
-    box-shadow: var(--shadow-medium);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35), 
+                inset 0 1px 3px rgba(255, 255, 255, 0.25), 
+                0 0 40px rgba(46, 78, 75, 0.3) !important;
 }
 
 @media (max-width: 768px) {
     .welcome-card {
-        padding: 48px 32px;
+        padding: 20px 20px;
     }
 }
 
 .welcome-title {
     font-family: var(--font-serif);
     font-size: 3.5rem;
-    /* Large elegant Welcome */
     font-weight: 500;
     text-align: center;
-    margin-bottom: 48px;
+    margin-bottom: 5px;
     letter-spacing: -0.02em;
 }
 
 .welcome-card .form-group {
-    margin-bottom: 24px;
+    margin-bottom: 12px;
 }
 
 .welcome-card .form-label {
     font-family: var(--font-sans);
-    font-weight: 500;
+    font-weight: 700 !important;
     color: var(--text-light);
     text-transform: none;
-    letter-spacing: normal;
-    font-size: 1.05rem;
+    letter-spacing: 0.5px !important;
+    font-size: 1.15rem !important;
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
 }
 
 .welcome-card .form-input,
@@ -1439,10 +1437,8 @@ table.admin-table tr.removed-row td strong {
     background-color: var(--bg-card-light) !important;
     color: var(--text-primary) !important;
     border-radius: 50px !important;
-    /* Fully rounded pill */
     border: none !important;
-    padding: 18px 28px !important;
-    /* Tall inputs */
+    padding: 10px 20px !important;
     font-size: 1.05rem !important;
     width: 100% !important;
     box-shadow: none;
@@ -1466,26 +1462,26 @@ table.admin-table tr.removed-row td strong {
 
 .welcome-btn-login {
     display: block;
-    margin: 40px auto 28px auto;
+    margin: 16px auto 8px auto;
     /* Centered with generous vertical space */
     max-width: 240px;
     width: 100%;
     border-radius: 50px;
     /* Pill button */
-    padding: 16px 32px;
+    padding: 12px 24px;
     font-size: 1.1rem;
-    font-weight: 600;
+    font-weight: 700 !important;
     text-align: center;
-    background-color: #a49d95;
-    /* Warm grey/taupe to match mockup */
-    color: var(--text-light);
+    background-color: #ffffff !important;
+    color: var(--bg-card-dark) !important;
     border: none;
     cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18) !important;
     transition: background var(--transition), transform var(--transition);
 }
 
 .welcome-btn-login:hover {
-    background-color: #928b83;
+    background-color: var(--bg-primary) !important;
     transform: translateY(-2px);
 }
 
@@ -1517,25 +1513,80 @@ table.admin-table tr.removed-row td strong {
     color: var(--bg-primary);
 }
 
-/* Role Toggle Selector */
-.role-toggle-group {
-    display: flex;
-    gap: 16px;
+/* Password Toggle Wrapper */
+.input-wrapper {
+    position: relative;
     width: 100%;
 }
 
-.role-toggle-btn {
+.input-wrapper .form-input {
+    padding-right: 60px !important; /* Make sure text doesn't hide behind eye icon */
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none !important;
+    border: none !important;
+    color: rgba(33, 43, 41, 0.5) !important;
+    font-size: 1.25rem !important;
+    cursor: pointer;
+    z-index: 10;
+    padding: 0 !important;
+    line-height: 1;
+    transition: color var(--transition) !important;
+}
+
+.password-toggle-btn:hover {
+    color: var(--text-primary) !important;
+}
+
+/* Password Requirements Checklist */
+.password-requirements {
+    margin-top: 12px;
+    padding: 0 16px;
+    font-size: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.req-item {
+    color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: color var(--transition);
+}
+
+.req-item.valid {
+    color: #4ade80 !important; /* bright green for valid requirements */
+}
+
+/* Role Segmented Control (Pill-shaped track) */
+.role-segmented-control {
+    display: flex;
+    background-color: rgba(255, 255, 255, 0.08);
+    border-radius: 50px;
+    padding: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    width: 100%;
+}
+
+.role-segmented-btn {
     flex: 1;
-    background-color: rgba(255, 255, 255, 0.12) !important;
+    background: transparent !important;
+    border: none !important;
     color: rgba(255, 255, 255, 0.75) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
     border-radius: 50px !important;
-    padding: 16px 28px !important;
+    padding: 14px 24px !important;
     font-size: 1.05rem !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     cursor: pointer;
     transition: all var(--transition) !important;
-    text-align: center;
     font-family: var(--font-sans) !important;
     display: inline-flex;
     align-items: center;
@@ -1543,22 +1594,43 @@ table.admin-table tr.removed-row td strong {
     gap: 8px;
 }
 
-.role-toggle-btn:hover {
-    background-color: rgba(255, 255, 255, 0.22) !important;
+.role-segmented-btn:hover {
     color: #ffffff !important;
-    border-color: rgba(255, 255, 255, 0.35) !important;
 }
 
-.role-toggle-btn.active {
+.role-segmented-btn.active {
     background-color: #ffffff !important;
     color: var(--text-primary) !important;
-    border-color: #ffffff !important;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Custom Input Placeholder Styling */
 .welcome-card .form-input::placeholder {
-    color: rgba(33, 43, 41, 0.45) !important;
+    color: rgba(33, 43, 41, 0.4) !important;
+    font-weight: 400 !important;
+}
+
+/* Logo on Welcome Card */
+.welcome-logo-container {
+    text-align: center;
+}
+
+.welcome-logo {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    display: inline-block !important;
+}
+
+/* Brand Italic Font Style */
+.brand-italic {
+    font-family: 'The Seasons', var(--font-serif) !important;
+    font-style: italic !important;
+    font-weight: 400 !important;
+    text-transform: none !important;
 }
 
 /* ─── Hero Landing View (Mockup 5) ──────────────────────────────────────────── */
