@@ -27,9 +27,9 @@ router.post('/', checkRole(['Guest']), async (req, res) => {
             return res.status(400).json({ message: 'Check-out must be after check-in.' });
         }
 
-        // ── Verify listing exists ─────────────────────────────────────────────
+        // ── Verify listing exists and is not removed ──────────────────────────
         const listing = await Listing.findById(listingId);
-        if (!listing) return res.status(404).json({ message: 'Listing not found.' });
+        if (!listing || listing.isRemoved) return res.status(404).json({ message: 'Listing not found.' });
 
         // ── Date-Range Overlap Check (against ALL approved bookings) ──────────
         const approvedBookings = await Booking.find({ listingId, status: 'approved' });
@@ -42,7 +42,17 @@ router.post('/', checkRole(['Guest']), async (req, res) => {
             });
         }
 
-        const booking = new Booking({ listingId, guestId, startDate: start, endDate: end, status: 'pending' });
+        const booking = new Booking({
+            listingId,
+            guestId,
+            startDate: start,
+            endDate: end,
+            status: 'pending',
+            listingName: listing.name,
+            listingLocation: listing.location,
+            listingType: listing.type,
+            listingImage: listing.image
+        });
         const saved   = await booking.save();
         res.status(201).json(saved);
     } catch (err) {
@@ -55,7 +65,7 @@ router.get('/mine', checkRole(['Guest']), async (req, res) => {
     try {
         const guestId  = req.userId;
         const bookings = await Booking.find({ guestId })
-            .populate('listingId', 'name location price image type contactNumber')
+            .populate('listingId', 'name location price image type contactNumber isRemoved')
             .sort({ createdAt: -1 });
 
         // Redact contact number unless booking is approved
@@ -81,7 +91,7 @@ router.get('/host', checkRole(['Host']), async (req, res) => {
         const listingIds = listings.map(l => l._id);
 
         const bookings = await Booking.find({ listingId: { $in: listingIds } })
-            .populate('listingId', 'name location price image type')
+            .populate('listingId', 'name location price image type isRemoved')
             .populate('guestId', 'name email')
             .sort({ createdAt: -1 });
 
@@ -105,7 +115,7 @@ router.get('/listing/:listingId', checkRole(['Host']), async (req, res) => {
         }
 
         const bookings = await Booking.find({ listingId })
-            .populate('listingId', 'name location price image type')
+            .populate('listingId', 'name location price image type isRemoved')
             .populate('guestId', 'name email')
             .sort({ createdAt: -1 });
 
@@ -169,13 +179,40 @@ router.put('/:id/status', checkRole(['Host']), async (req, res) => {
 router.get('/', checkRole(['Admin']), async (req, res) => {
     try {
         const bookings = await Booking.find()
-            .populate('listingId', 'name location type price')
+            .populate('listingId', 'name location type price isRemoved')
             .populate('guestId',   'name email')
             .sort({ createdAt: -1 });
 
         res.status(200).json(bookings);
     } catch (err) {
         res.status(500).json({ message: 'Error fetching all bookings.', error: err.message });
+    }
+});
+
+router.delete('/:id', checkRole(['Guest', 'Host', 'Admin']), async (req, res) => {
+    try {
+        const booking = await Booking.findById(req.params.id);
+        if (!booking) return res.status(404).json({ message: 'Booking not found.' });
+
+        if (req.userRole === 'Guest') {
+            // Verify this booking belongs to the logged-in Guest
+            if (booking.guestId.toString() !== req.userId) {
+                return res.status(403).json({ message: 'You do not own this booking.' });
+            }
+        } else if (req.userRole === 'Host') {
+            // Verify host owns the listing associated with this booking
+            if (booking.listingId) {
+                const listing = await Listing.findById(booking.listingId);
+                if (listing && listing.hostId.toString() !== req.userId) {
+                    return res.status(403).json({ message: 'You do not own the listing associated with this booking.' });
+                }
+            }
+        }
+
+        await Booking.findByIdAndDelete(req.params.id);
+        res.status(200).json({ message: 'Booking deleted successfully.' });
+    } catch (err) {
+        res.status(500).json({ message: 'Error deleting booking.', error: err.message });
     }
 });
 

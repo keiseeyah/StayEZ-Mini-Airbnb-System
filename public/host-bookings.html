@@ -66,7 +66,7 @@
             listings.forEach(l => {
                 const opt = document.createElement('option');
                 opt.value       = l._id;
-                opt.textContent = l.name;
+                opt.textContent = l.name + (l.isRemoved ? ' (Removed)' : '');
                 select.appendChild(opt);
             });
 
@@ -154,10 +154,11 @@
         // Render Request Cards (Mockup 15)
         container.innerHTML = bookings.map(b => {
             const listObj   = b.listingId || {};
-            const name      = listObj.name || 'Listing Removed';
-            const location  = listObj.location || 'N/A';
-            const type      = listObj.type || 'N/A';
-            const imgSrc    = listObj.image || '/images/bedroom-balcony.jpg';
+            const isRemoved = listObj.isRemoved || !b.listingId;
+            const name      = listObj.name || (b.listingName || 'Listing Removed');
+            const location  = listObj.location || (b.listingLocation || 'N/A');
+            const type      = listObj.type || (b.listingType || 'N/A');
+            const imgSrc    = listObj.image || (b.listingImage || '/images/bedroom-balcony.jpg');
 
             const guestName = b.guestId ? b.guestId.name : 'N/A';
             const guestEmail = b.guestId ? b.guestId.email : '—';
@@ -165,25 +166,20 @@
             const isApproved = b.status === 'approved';
 
             let actionButtonsHtml = '';
-            if (isPending) {
+            if (isRemoved) {
+                actionButtonsHtml = `
+                    <span style="color:#ff8e8e; font-size: 0.95rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; margin-right: 12px;">⚠️ Listing Removed</span>
+                    <button onclick="deleteBookingRecord('${b._id}')" class="btn btn-danger btn-sm" style="padding: 6px 12px; font-size: 0.75rem; border: none; background-color: var(--danger);">🗑️ Delete</button>
+                `;
+            } else if (isPending) {
                 actionButtonsHtml = `
                     <button onclick="updateStatus('${b._id}', 'approved')" class="btn btn-success btn-sm" id="approve-${b._id}">✓ Approve</button>
                     <button onclick="updateStatus('${b._id}', 'rejected')" class="btn btn-danger btn-sm" id="reject-${b._id}">✕ Reject</button>
                 `;
-            } else if (isApproved) {
-                actionButtonsHtml = `
-                    <button class="btn btn-success btn-sm" disabled style="opacity: 0.9;">✓ Approve</button>
-                    <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.4;">✕ Reject</button>
-                `;
-            } else {
-                actionButtonsHtml = `
-                    <button class="btn btn-secondary btn-sm" disabled style="opacity: 0.4;">✓ Approve</button>
-                    <button class="btn btn-danger btn-sm" disabled style="opacity: 0.9;">✕ Reject</button>
-                `;
             }
 
             return `
-                <div class="request-card" id="card-${b._id}">
+                <div class="request-card ${isRemoved ? 'removed' : ''}" id="card-${b._id}">
                     <div class="request-card-content">
                         <!-- Left Image with type ribbon badge -->
                         <div class="booking-img-container">
@@ -237,6 +233,18 @@
             showToast(err.message, 'error');
             if (approveBtn) approveBtn.disabled = false;
             if (rejectBtn)  rejectBtn.disabled  = false;
+        }
+    }
+
+    async function deleteBookingRecord(id) {
+        const confirmed = await showConfirm('Remove Booking Request?', 'Are you sure you want to remove this booking request from your records?');
+        if (!confirmed) return;
+        try {
+            await api('DELETE', '/bookings/' + id);
+            showToast('Booking request removed from records.', 'success');
+            loadBookings(document.getElementById('listing-select').value);
+        } catch (err) {
+            showToast(err.message, 'error');
         }
     }
 </script>

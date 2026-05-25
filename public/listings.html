@@ -38,6 +38,7 @@
                 </div>
                 <div class="filter-section-title">Type</div>
                 <div class="filter-option-list" id="filter-type-list">
+                    <div class="filter-option selected" data-value="">All Types</div>
                     <div class="filter-option" data-value="hotel">Hotel</div>
                     <div class="filter-option" data-value="apartment">Apartment</div>
                     <div class="filter-option" data-value="dorm">Dorm</div>
@@ -48,11 +49,11 @@
 
         <!-- Sort Dropdown wrapper -->
         <div class="dropdown-wrapper">
-            <button id="sort-toggle" class="btn btn-sort">Sort <span>∨</span></button>
+            <button id="sort-toggle" class="btn btn-sort">Prices <span>∨</span></button>
             <!-- Sort Dropdown Card -->
             <div id="sort-card" class="sort-dropdown-card">
-                <button class="sort-btn-option" data-value="price_asc">Ascending</button>
-                <button class="sort-btn-option" data-value="price_desc">Descending</button>
+                <button class="sort-btn-option" data-value="price_desc">High to Low</button>
+                <button class="sort-btn-option" data-value="price_asc">Low to High</button>
             </div>
         </div>
     </div>
@@ -155,8 +156,13 @@
     typeOptions.forEach(opt => {
         opt.addEventListener('click', () => {
             if (opt.classList.contains('selected')) {
+                if (opt.getAttribute('data-value') === "") {
+                    return;
+                }
                 opt.classList.remove('selected');
                 selectedType = "";
+                const allTypesOpt = Array.from(typeOptions).find(o => o.getAttribute('data-value') === "");
+                if (allTypesOpt) allTypesOpt.classList.add('selected');
             } else {
                 typeOptions.forEach(o => o.classList.remove('selected'));
                 opt.classList.add('selected');

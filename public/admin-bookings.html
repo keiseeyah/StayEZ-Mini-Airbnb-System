@@ -21,7 +21,7 @@
 
         <!-- Redesigned Search & Filter Header (Mockup 18) -->
         <div
-            style="display: flex; align-items: center; justify-content: flex-end; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+            style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
             <div class="search-pill-container" style="margin: 0; max-width: 320px; flex-grow: 1;">
                 <input type="text" id="search" class="search-pill-input" placeholder="Search Bookings..."
                     style="padding: 12px 40px 12px 20px; font-size: 0.95rem;">
@@ -129,16 +129,21 @@
                             <th>Start date</th>
                             <th>End Date</th>
                             <th style="text-align: center; width: 140px;">Status</th>
+                            <th style="width: 60px; text-align: center;"></th>
                         </tr>
                     </thead>
                     <tbody>
                         ${bookings.map(b => {
                 const bookingIdShort = b._id ? b._id.substring(b._id.length - 8).toUpperCase() : 'N/A';
                 const guestName = b.guestId ? b.guestId.name : 'N/A';
-                const listingName = b.listingId ? b.listingId.name : 'Listing Removed';
+                const l = b.listingId;
+                const isRemoved = !l || l.isRemoved;
+                const listingName = l 
+                    ? (l.name + (l.isRemoved ? ' (Removed)' : '')) 
+                    : (b.listingName ? b.listingName + ' (Removed)' : 'Listing Removed');
                 const statusVal = b.status || 'pending';
                 return `
-                            <tr>
+                            <tr class="${isRemoved ? 'removed-row' : ''}">
                                 <td><span style="font-family: monospace; font-weight: 700; color: var(--text-secondary);">#${bookingIdShort}</span></td>
                                 <td><strong>${guestName}</strong></td>
                                 <td>${listingName}</td>
@@ -148,6 +153,9 @@
                                     <span class="status-pill ${statusVal.toLowerCase()}" style="padding: 6px 16px; font-size: 0.72rem; border-radius: 15px; border: none; font-weight: 700;">
                                         ${statusVal}
                                     </span>
+                                </td>
+                                <td style="text-align: center;">
+                                    ${isRemoved ? `<button onclick="deleteBookingRecord('${b._id}')" class="admin-delete-btn" title="Delete Booking Request">❌</button>` : ''}
                                 </td>
                             </tr>`;
             }).join('')}
@@ -175,6 +183,18 @@
                 filterAndRenderBookings();
             });
         });
+
+        async function deleteBookingRecord(id) {
+            const confirmed = await showConfirm('Permanently Delete Booking Record?', 'Are you sure you want to permanently delete this booking request from the records? This cannot be undone.');
+            if (!confirmed) return;
+            try {
+                await api('DELETE', '/bookings/' + id);
+                showToast('Booking request permanently deleted.', 'success');
+                loadBookings();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
     </script>
 </body>
 

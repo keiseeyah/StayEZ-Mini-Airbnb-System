@@ -23,7 +23,11 @@ const bookingSchema = new mongoose.Schema({
         type: String,
         enum: ['pending', 'approved', 'rejected'],
         default: 'pending' // As per the booking logic specs
-    }
+    },
+    listingName: String,
+    listingLocation: String,
+    listingType: String,
+    listingImage: String
 }, { timestamps: true });
 
 module.exports = mongoose.model('Booking', bookingSchema);

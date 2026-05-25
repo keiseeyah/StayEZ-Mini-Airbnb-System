@@ -145,3 +145,70 @@ function formatDate(d) {
 function statusBadge(status) {
     return `<span class="status-pill ${status.toLowerCase()}">${status}</span>`;
 }
+
+/* ─── Custom Premium Dialog Modal ───────────────────────────────────────────── */
+function showConfirm(title, message) {
+    return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(18, 30, 29, 0.7);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10000;
+            backdrop-filter: blur(6px);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        `;
+
+        const card = document.createElement('div');
+        card.style.cssText = `
+            background: var(--bg-primary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            max-width: 440px;
+            width: 90%;
+            box-shadow: var(--shadow-medium);
+            text-align: center;
+            transform: scale(0.85);
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: var(--text-primary);
+        `;
+
+        card.innerHTML = `
+            <h3 style="font-family: var(--font-serif); font-size: 1.45rem; font-weight: 700; margin-bottom: 12px; color: var(--accent-teal);">${title}</h3>
+            <p style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.6; font-family: var(--font-sans);">${message}</p>
+            <div style="display: flex; gap: 14px; justify-content: center;">
+                <button id="modal-cancel-btn" class="btn btn-outline" style="border-radius: 20px; padding: 10px 24px; font-size: 0.9rem; min-width: 100px;">Cancel</button>
+                <button id="modal-confirm-btn" class="btn btn-danger" style="border-radius: 20px; padding: 10px 24px; font-size: 0.9rem; min-width: 100px; border: none; background-color: var(--danger); color: white;">Confirm</button>
+            </div>
+        `;
+
+        overlay.appendChild(card);
+        document.body.appendChild(overlay);
+
+        // Animate in
+        requestAnimationFrame(() => {
+            overlay.style.opacity = '1';
+            card.style.transform = 'scale(1)';
+        });
+
+        const close = (result) => {
+            overlay.style.opacity = '0';
+            card.style.transform = 'scale(0.85)';
+            setTimeout(() => {
+                overlay.remove();
+                resolve(result);
+            }, 250);
+        };
+
+        overlay.querySelector('#modal-cancel-btn').addEventListener('click', () => close(false));
+        overlay.querySelector('#modal-confirm-btn').addEventListener('click', () => close(true));
+        
+        // Also close on overlay click (cancel)
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) close(false);
+        });
+    });
+}

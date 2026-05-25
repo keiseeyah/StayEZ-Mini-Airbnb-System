@@ -17,26 +17,28 @@
     </div>
 
     <!-- Redesigned Search & Filter Header (Mockup 16) -->
-    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
         <div class="search-pill-container" style="margin: 0; max-width: 320px; flex-grow: 1;">
             <input type="text" id="search" class="search-pill-input" placeholder="Search Listings..." style="padding: 12px 40px 12px 20px; font-size: 0.95rem;">
             <span class="search-pill-icon">🔍</span>
         </div>
-        <button id="filter-toggle" class="btn btn-filter" style="font-size: 0.95rem; padding: 10px 24px; min-width: auto; border-radius: 20px;">Filter <span>∨</span></button>
-    </div>
-
-    <!-- Filter Dropdown Card -->
-    <div id="filter-card" class="filter-dropdown-card" style="margin: -14px 0 24px auto;">
-        <div class="filter-section-title">Location</div>
-        <div class="form-group">
-            <input type="text" id="filter-location" class="form-input" style="border-radius: 20px; background-color: var(--bg-primary);" placeholder="Search Location...">
-        </div>
-        <div class="filter-section-title">Type</div>
-        <div class="filter-option-list" id="filter-type-list">
-            <div class="filter-option" data-value="hotel">Hotel</div>
-            <div class="filter-option" data-value="apartment">Apartment</div>
-            <div class="filter-option" data-value="dorm">Dorm</div>
-            <div class="filter-option" data-value="guest_room">Guest Room</div>
+        <div class="dropdown-wrapper">
+            <button id="filter-toggle" class="btn btn-filter" style="font-size: 0.95rem; padding: 10px 24px; min-width: auto; border-radius: 20px;">Filter <span>∨</span></button>
+            <!-- Filter Dropdown Card -->
+            <div id="filter-card" class="filter-dropdown-card" style="right: 0;">
+                <div class="filter-section-title">Location</div>
+                <div class="form-group">
+                    <input type="text" id="filter-location" class="form-input" style="border-radius: 20px; background-color: white;" placeholder="Search Location...">
+                </div>
+                <div class="filter-section-title">Type</div>
+                <div class="filter-option-list" id="filter-type-list">
+                    <div class="filter-option selected" data-value="">All Types</div>
+                    <div class="filter-option" data-value="hotel">Hotel</div>
+                    <div class="filter-option" data-value="apartment">Apartment</div>
+                    <div class="filter-option" data-value="dorm">Dorm</div>
+                    <div class="filter-option" data-value="guest_room">Guest Room</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -49,10 +51,9 @@
 
 <script src="/app.js"></script>
 <script>
+    let selectedType = "";
     const user = requireAuth(['Admin']);
     if (user) { renderNav('/admin-listings.html'); fetchListings(); }
-
-    let selectedType = "";
 
     // Toggle Filter card
     const filterToggle = document.getElementById('filter-toggle');
@@ -72,24 +73,26 @@
     });
 
     async function fetchListings() {
-        const search   = document.getElementById('search').value.trim();
-        const location = document.getElementById('filter-location').value.trim();
-
-        const params = new URLSearchParams();
-        if (search)       params.append('search',   search);
-        if (location)     params.append('location', location);
-        if (selectedType) params.append('type',     selectedType);
-
-        document.getElementById('listings-container').innerHTML =
-            '<div class="loading"><div class="spinner"></div><span>Loading…</span></div>';
-
         try {
-            const listings = await api('GET', '/listings?' + params);
+            const search   = document.getElementById('search').value.trim();
+            const location = document.getElementById('filter-location').value.trim();
+
+            const params = new URLSearchParams();
+            if (search)       params.append('search',   search);
+            if (location)     params.append('location', location);
+            if (selectedType) params.append('type',     selectedType);
+
+            document.getElementById('listings-container').innerHTML =
+                '<div class="loading"><div class="spinner"></div><span>Loading…</span></div>';
+
+            const listings = await api('GET', '/listings?' + params.toString());
             document.getElementById('count').textContent =
                 `${listings.length} listing${listings.length !== 1 ? 's' : ''} found`;
             renderListings(listings);
         } catch (err) {
             showToast(err.message, 'error');
+            document.getElementById('listings-container').innerHTML =
+                `<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>Failed to load listings</h3><p>${err.message}</p></div>`;
         }
     }
 
@@ -134,7 +137,8 @@
     }
 
     async function deleteListing(id) {
-        if (!confirm('Permanently delete this listing? This cannot be undone.')) return;
+        const confirmed = await showConfirm('Permanently Delete Listing?', 'Permanently delete this listing? This action cannot be undone.');
+        if (!confirmed) return;
         try {
             await api('DELETE', '/listings/' + id);
             showToast('Listing deleted successfully.', 'success');
@@ -152,8 +156,13 @@
     typeOptions.forEach(opt => {
         opt.addEventListener('click', () => {
             if (opt.classList.contains('selected')) {
+                if (opt.getAttribute('data-value') === "") {
+                    return;
+                }
                 opt.classList.remove('selected');
                 selectedType = "";
+                const allTypesOpt = Array.from(typeOptions).find(o => o.getAttribute('data-value') === "");
+                if (allTypesOpt) allTypesOpt.classList.add('selected');
             } else {
                 typeOptions.forEach(o => o.classList.remove('selected'));
                 opt.classList.add('selected');

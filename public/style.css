@@ -427,6 +427,14 @@ nav#main-nav {
 }
 
 /* ─── Search, Filters & Sorting ─────────────────────────────────────────────── */
+.search-controls-container {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto 30px;
+    width: 100%;
+}
 .search-pill-container {
     position: relative;
     flex: 1;
@@ -814,15 +822,9 @@ nav#main-nav {
 /* ─── Cards & Grid System ───────────────────────────────────────────────────── */
 .listing-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
     padding: 8px 0;
-}
-
-@media (max-width: 1200px) {
-    .listing-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
 }
 
 @media (max-width: 992px) {
@@ -996,6 +998,14 @@ nav#main-nav {
     box-shadow: var(--shadow-soft);
     margin-bottom: 24px;
 }
+.booking-card.removed, .host-listing-card.removed, .request-card.removed {
+    background-color: #4b5553 !important;
+    opacity: 0.85;
+    border: 1px dashed rgba(255, 255, 255, 0.25);
+}
+.booking-card.removed .status-pill, .request-card.removed .status-pill {
+    opacity: 0.8;
+}
 
 .booking-card-main {
     display: flex;
@@ -1071,6 +1081,7 @@ nav#main-nav {
     letter-spacing: 1px;
     text-transform: uppercase;
     border: 1.5px solid var(--text-light);
+    color: var(--text-light);
 }
 
 .status-pill.pending {
@@ -1293,6 +1304,15 @@ table.admin-table tr:hover td {
 
 table.admin-table tr:last-child td {
     border-bottom: none;
+}
+
+table.admin-table tr.removed-row td {
+    background-color: #eae6e1 !important;
+    color: #8c9694 !important;
+    opacity: 0.8;
+}
+table.admin-table tr.removed-row td strong {
+    color: #8c9694 !important;
 }
 
 /* Red delete icon button */
@@ -1602,6 +1622,10 @@ table.admin-table tr:last-child td {
     font-size: 1.1rem;
     flex-shrink: 0;
 }
+.toast.toast-error {
+    background-color: var(--danger);
+    color: #ffffff;
+}
 
 /* ─── Loading & Empty States ────────────────────────────────────────────────── */
 .loading {
@@ -1645,6 +1669,41 @@ table.admin-table tr:last-child td {
     font-size: 1.35rem;
     color: var(--text-primary);
     margin-bottom: 6px;
+}
+
+/* ─── Error Alert Boxes ──────────────────────────────────────────────────────── */
+.error-box {
+    display: none;
+    background-color: var(--danger);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    color: #ffffff;
+    border-radius: var(--radius-md);
+    padding: 14px 18px;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    margin-bottom: 24px;
+    font-family: var(--font-sans);
+    box-sizing: border-box;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: fadeIn 0.2s ease-out;
+}
+.error-box::before {
+    content: "⚠️";
+    font-size: 1.1rem;
+    vertical-align: middle;
+    margin-right: 8px;
+    display: inline-block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ─── Responsive Adjustments ────────────────────────────────────────────────── */

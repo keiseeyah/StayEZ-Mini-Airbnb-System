@@ -18,7 +18,7 @@ router.get('/host', checkRole(['Host']), async (req, res) => {
 router.get('/', async (req, res) => {
     try {
         const { search, location, type, sort } = req.query;
-        const query = {};
+        const query = { isRemoved: { $ne: true } };
 
         if (search)   query.name     = { $regex: search,   $options: 'i' };
         if (location) query.location = { $regex: location, $options: 'i' };
@@ -51,7 +51,7 @@ router.post('/', checkRole(['Host']), async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         const listing = await Listing.findById(req.params.id);
-        if (!listing) return res.status(404).json({ message: 'Listing not found.' });
+        if (!listing || listing.isRemoved) return res.status(404).json({ message: 'Listing not found.' });
         res.status(200).json(listing);
     } catch (err) {
         res.status(500).json({ message: 'Error fetching listing.', error: err.message });
@@ -85,8 +85,16 @@ router.delete('/:id', checkRole(['Host', 'Admin']), async (req, res) => {
             return res.status(403).json({ message: 'You do not own this listing.' });
         }
 
-        await Listing.findByIdAndDelete(req.params.id);
-        res.status(200).json({ message: 'Listing deleted successfully.' });
+        if (listing.isRemoved) {
+            // Already soft-deleted: hard-delete from the database
+            await Listing.findByIdAndDelete(req.params.id);
+            res.status(200).json({ message: 'Listing permanently deleted from records.' });
+        } else {
+            // Soft-delete
+            listing.isRemoved = true;
+            await listing.save();
+            res.status(200).json({ message: 'Listing deleted successfully.' });
+        }
     } catch (err) {
         res.status(500).json({ message: 'Error deleting listing.', error: err.message });
     }
