@@ -1500,6 +1500,45 @@ table.admin-table tr.removed-row td strong {
     color: var(--bg-primary);
 }
 
+/* Role Toggle Selector */
+.role-toggle-group {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+}
+
+.role-toggle-btn {
+    flex: 1;
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    color: rgba(255, 255, 255, 0.75) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 50px !important;
+    padding: 16px 28px !important;
+    font-size: 1.05rem !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+    transition: all var(--transition) !important;
+    text-align: center;
+    font-family: var(--font-sans) !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.role-toggle-btn:hover {
+    background-color: rgba(255, 255, 255, 0.22) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.35) !important;
+}
+
+.role-toggle-btn.active {
+    background-color: #ffffff !important;
+    color: var(--text-primary) !important;
+    border-color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+}
+
 /* ─── Hero Landing View (Mockup 5) ──────────────────────────────────────────── */
 .hero-container {
     width: 100%;
