@@ -7,6 +7,7 @@
     <title>StayEZ — Home</title>
     <meta name="description"
         content="Welcome to StayEZ, your premium mini Airbnb platform for finding and booking the perfect stay.">
+    <link rel="icon" type="image/png" href="/images/logo.png">
     <link rel="stylesheet" href="/style.css">
 </head>
 
@@ -22,6 +23,9 @@
 
     <script src="/app.js"></script>
     <script>
+        const EYE_VISIBLE_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" fill="currentColor" style="width: 20px; height: 20px; vertical-align: middle;"><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.4 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64a64 64 0 1 0 0 128 64 64 0 1 0 0-128z"/></svg>`;
+        const EYE_HIDDEN_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" fill="currentColor" style="width: 20px; height: 20px; vertical-align: middle; transform: scaleX(-1);"><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L512.1 371.1C550.8 333.1 582.4 287.4 597.5 253c3.3-7.9 3.3-16.7 0-24.6C582.6 192.7 551.3 140.7 504.5 97.3C457.4 53.5 392.7 16 312 16c-48.4 0-92.4 13.6-130.6 34.7L38.8 5.1zM312 208a48 48 0 1 0 0 96 48 48 0 1 0 0-96zM76.9 146c-18 20.3-33.9 43.1-47.1 63.3c-3.3 7.9-3.3 16.7 0 24.6C44.7 269.3 76 321.3 122.8 364.7C169.9 408.5 234.6 445 315 445c55.3 0 104.9-17 147-46.7L406.2 353c-24.1 14.5-52.9 23-83.8 23c-80.8 0-145.5-36.8-192.6-80.6C82.8 252 51.5 200 36.6 164.3c-.6-1.5-1.1-2.9-1.7-4.4L76.9 146zM312 144c14.2 0 27.6 4.1 39 11.3L312 184.2l-39 30.8V208c0-35.3 28.7-64 64-64z"/></svg>`;
+
         const existing = getUser();
         if (existing) {
             if (existing.role === 'Host') {
@@ -58,7 +62,7 @@
                         <label class="form-label" for="password">Password</label>
                         <div class="input-wrapper">
                             <input type="password" id="password" class="form-input" placeholder="Enter your password" required autocomplete="current-password">
-                            <button type="button" class="password-toggle-btn" id="password-toggle">👁️</button>
+                            <button type="button" class="password-toggle-btn" id="password-toggle">${EYE_VISIBLE_SVG}</button>
                         </div>
                     </div>
                     <div id="login-error" class="error-box"></div>
@@ -75,10 +79,10 @@
         pwdToggle.addEventListener('click', () => {
             if (pwdInput.type === 'password') {
                 pwdInput.type = 'text';
-                pwdToggle.textContent = '🙈';
+                pwdToggle.innerHTML = EYE_HIDDEN_SVG;
             } else {
                 pwdInput.type = 'password';
-                pwdToggle.textContent = '👁️';
+                pwdToggle.innerHTML = EYE_VISIBLE_SVG;
             }
         });
 
