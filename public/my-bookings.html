@@ -91,7 +91,7 @@
                                     ${isRemoved ? `<span style="color:#ff8e8e; font-size: 0.85rem; font-weight: 600; margin-top: 4px; display: inline-flex; align-items: center; gap: 4px;">⚠️ Listing Removed</span>` : ''}
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 12px;">
-                                    ${isRemoved ? `<button onclick="deleteBooking('${b._id}')" class="btn btn-danger btn-sm" style="padding: 6px 12px; font-size: 0.75rem; border: none; background-color: var(--danger);">🗑️ Delete</button>` : ''}
+                                    ${isRemoved ? `<button onclick="deleteBooking('${b._id}')" class="btn btn-danger btn-sm" style="padding: 6px 12px; font-size: 0.75rem; border: none; background-color: var(--danger);"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width: 14px; height: 14px; vertical-align: middle; margin-right: 4px;"><g transform="rotate(-12, 12, 6)"><path d="M9 4.5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 4.5V5H9v-.5z" /><rect x="4" y="5" width="16" height="2" rx="1" /></g><path d="M5 9v10a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3V9H5zm4 10a1 1 0 0 1-2 0v-6a1 1 0 0 1 2 0v6zm4 0a1 1 0 0 1-2 0v-6a1 1 0 0 1 2 0v6zm4 0a1 1 0 0 1-2 0v-6a1 1 0 0 1 2 0v6z" /></svg> Delete</button>` : ''}
                                     ${statusBadge(b.status)}
                                 </div>
                             </div>
