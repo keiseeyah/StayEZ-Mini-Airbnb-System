@@ -1367,6 +1367,12 @@ nav#main-nav {
     border: 1px solid rgba(139, 90, 43, 0.2) !important;
 }
 
+.listing-type-badge.loft {
+    background-color: rgba(74, 87, 89, 0.1) !important;
+    color: #4a5759 !important;
+    border: 1px solid rgba(74, 87, 89, 0.2) !important;
+}
+
 /* Color codes for ribbon badges on listing grids */
 .ribbon-badge.apartment {
     background-color: #d95d39 !important;
@@ -1385,6 +1391,9 @@ nav#main-nav {
 }
 .ribbon-badge.cabin {
     background-color: #8b5a2b !important;
+}
+.ribbon-badge.loft {
+    background-color: #4a5759 !important;
 }
 
 .detail-desc {
